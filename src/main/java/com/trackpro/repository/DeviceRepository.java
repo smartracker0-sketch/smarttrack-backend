@@ -1,0 +1,14 @@
+package com.trackpro.repository;
+
+import com.trackpro.model.DeviceEntity;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
+    boolean existsByImei(String imei);
+    Page<DeviceEntity> findByOwnerId(UUID ownerId, Pageable pageable);
+    Optional<DeviceEntity> findByIdAndOwnerId(UUID id, UUID ownerId);
+}
