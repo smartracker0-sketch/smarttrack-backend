@@ -1,6 +1,6 @@
 #FileLock
-#Mon Apr 13 08:30:24 WAT 2026
-server=192.168.1.173\:51238
-hostName=192.168.1.173
+#Fri Jun 19 17:14:33 WAT 2026
+server=192.168.18.8\:62545
+hostName=192.168.18.8
 method=file
-id=19d85bf92479ff6be1cb3b7b25f6f6f1ede7bd390ee
+id=19ee0a97efe9f4464b0cbc7bef1a35e64b9fcffa46d
