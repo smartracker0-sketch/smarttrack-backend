@@ -67,6 +67,10 @@ public class DeviceService {
     }
 
     static DeviceDto toDto(DeviceEntity e) {
-        return new DeviceDto(e.getId(), e.getImei(), e.getName(), e.getCreatedAt());
+        return new DeviceDto(
+                e.getId(), e.getImei(), e.getName(),
+                e.getDeviceType(), e.getFirmware(), e.getVehiclePlate(),
+                e.getStatus(), e.getCreatedAt()
+        );
     }
 }

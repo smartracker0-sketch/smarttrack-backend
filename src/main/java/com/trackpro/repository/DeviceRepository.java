@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
     boolean existsByImei(String imei);
+    Optional<DeviceEntity> findByImei(String imei);
     Page<DeviceEntity> findByOwnerId(UUID ownerId, Pageable pageable);
     Optional<DeviceEntity> findByIdAndOwnerId(UUID id, UUID ownerId);
+    Page<DeviceEntity> findByOrganisationId(UUID organisationId, Pageable pageable);
 }

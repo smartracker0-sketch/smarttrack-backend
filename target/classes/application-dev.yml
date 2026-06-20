@@ -41,6 +41,14 @@ trackpro:
       access-token-ttl: PT15M
       refresh-token-ttl: P7D
 
+trackpro:
+  telemetry:
+    tcp:
+      port: 5023
+      enabled: true
+    mqtt:
+      enabled: false
+
 management:
   endpoints:
     web:

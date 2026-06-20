@@ -55,7 +55,7 @@ public class DataInitializer implements ApplicationRunner {
         if (userRepository.existsByEmailIgnoreCase(adminProps.email())) {
             return;
         }
-        RoleEntity adminRole = roleRepository.findByName(RoleName.ADMIN).orElseThrow();
+        RoleEntity adminRole = roleRepository.findByName(RoleName.SUPER_ADMIN).orElseThrow();
         UserEntity user = new UserEntity();
         user.setEmail(adminProps.email());
         user.setPasswordHash(passwordEncoder.encode(adminProps.password()));

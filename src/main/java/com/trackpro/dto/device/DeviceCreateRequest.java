@@ -10,6 +10,12 @@ public record DeviceCreateRequest(
         String imei,
         @NotBlank
         @Size(max = 120)
-        String name
+        String name,
+        String deviceType,
+        String firmware,
+        String simCard,
+        String serialNo,
+        String vehiclePlate,
+        String notes
 ) {
 }

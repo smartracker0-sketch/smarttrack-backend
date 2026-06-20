@@ -34,6 +34,19 @@ trackpro:
       access-token-ttl: PT15M
       refresh-token-ttl: P7D
 
+trackpro:
+  telemetry:
+    tcp:
+      port: ${TRACKPRO_TCP_PORT:5023}
+      enabled: ${TRACKPRO_TCP_ENABLED:true}
+    mqtt:
+      broker-url: ${TRACKPRO_MQTT_BROKER:tcp://localhost:1883}
+      client-id: ${TRACKPRO_MQTT_CLIENT_ID:trackpro-backend}
+      username: ${TRACKPRO_MQTT_USER:}
+      password: ${TRACKPRO_MQTT_PASS:}
+      topic-prefix: ${TRACKPRO_MQTT_TOPIC_PREFIX:trackpro/devices}
+      enabled: ${TRACKPRO_MQTT_ENABLED:true}
+
 management:
   endpoints:
     web:

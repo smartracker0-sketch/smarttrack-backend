@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -40,6 +41,10 @@ public class UserEntity {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organisation_id")
+    private com.trackpro.model.OrganisationEntity organisation;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -103,5 +108,13 @@ public class UserEntity {
 
     public void setRoles(Set<RoleEntity> roles) {
         this.roles = roles;
+    }
+
+    public com.trackpro.model.OrganisationEntity getOrganisation() {
+        return organisation;
+    }
+
+    public void setOrganisation(com.trackpro.model.OrganisationEntity organisation) {
+        this.organisation = organisation;
     }
 }
