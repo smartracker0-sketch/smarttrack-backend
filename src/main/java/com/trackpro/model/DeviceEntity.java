@@ -61,6 +61,7 @@ public class DeviceEntity {
     private Instant createdAt;
 
     public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public UserEntity getOwner() { return owner; }
     public void setOwner(UserEntity owner) { this.owner = owner; }

@@ -33,8 +33,6 @@ trackpro:
       secret: ${TRACKPRO_JWT_SECRET:dev-change-me-dev-change-me-dev-change-me-dev-change-me}
       access-token-ttl: PT15M
       refresh-token-ttl: P7D
-
-trackpro:
   telemetry:
     tcp:
       port: ${TRACKPRO_TCP_PORT:5023}
