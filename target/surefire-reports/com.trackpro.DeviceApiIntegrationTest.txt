@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 Test set: com.trackpro.DeviceApiIntegrationTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 14.49 s <<< FAILURE! -- in com.trackpro.DeviceApiIntegrationTest
-com.trackpro.DeviceApiIntegrationTest.createAndListDevices -- Time elapsed: 0.016 s <<< ERROR!
-java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@66e218d8 testClass = com.trackpro.DeviceApiIntegrationTest, locations = [], classes = [com.trackpro.TrackProApplication], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [[ImportsContextCustomizer@5b80b41d key = [org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@7f2cfe3f, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@6bb4dd34, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@4b86805d, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@4b3fa0b3, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1ebea008, org.springframework.boot.test.context.SpringBootTestAnnotation@bea04389], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 24.39 s <<< FAILURE! -- in com.trackpro.DeviceApiIntegrationTest
+com.trackpro.DeviceApiIntegrationTest.createAndListDevices -- Time elapsed: 0.137 s <<< ERROR!
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@25c3a441 testClass = com.trackpro.DeviceApiIntegrationTest, locations = [], classes = [com.trackpro.TrackProApplication], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [[ImportsContextCustomizer@2057d8ec key = [org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@7f2cfe3f, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@6bb4dd34, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@4b86805d, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@4b3fa0b3, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1ebea008, org.springframework.boot.test.context.SpringBootTestAnnotation@bea04389], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
 	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
 	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
 	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191)
@@ -22,40 +22,13 @@ java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMerge
 	at java.base/java.util.Optional.orElseGet(Optional.java:364)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Migration V3__device_extended_fields.sql failed
------------------------------------------------
-SQL State  : 42000
-Error Code : 42000
-Message    : Syntax error in SQL statement "alter table devices\000a  add column if not exists organisation_id uuid references organisations(id) on delete set null[*],\000a  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',\000a  add column if not exists firmware        varchar(32)  not null default 'unknown',\000a  add column if not exists sim_card        varchar(64),\000a  add column if not exists serial_no       varchar(64),\000a  add column if not exists vehicle_plate   varchar(64),\000a  add column if not exists status          varchar(32)  not null default 'Unassigned',\000a  add column if not exists notes           text"; SQL statement:
-alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text [42000-224]
-Location   : db/migration/V3__device_extended_fields.sql (/Users/mac/Documents/GitHub/tracpro/backend/target/classes/db/migration/V3__device_extended_fields.sql)
-Line       : 1
-Statement  : alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text
-
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing column [accuracym] in table [telemetry_events]
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1786)
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
 	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
 	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
 	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:313)
 	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
 	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1234)
 	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:952)
@@ -73,113 +46,29 @@ Statement  : alter table devices
 	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
 	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
 	... 17 more
-Caused by: org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V3__device_extended_fields.sql failed
------------------------------------------------
-SQL State  : 42000
-Error Code : 42000
-Message    : Syntax error in SQL statement "alter table devices\000a  add column if not exists organisation_id uuid references organisations(id) on delete set null[*],\000a  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',\000a  add column if not exists firmware        varchar(32)  not null default 'unknown',\000a  add column if not exists sim_card        varchar(64),\000a  add column if not exists serial_no       varchar(64),\000a  add column if not exists vehicle_plate   varchar(64),\000a  add column if not exists status          varchar(32)  not null default 'Unassigned',\000a  add column if not exists notes           text"; SQL statement:
-alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text [42000-224]
-Location   : db/migration/V3__device_extended_fields.sql (/Users/mac/Documents/GitHub/tracpro/backend/target/classes/db/migration/V3__device_extended_fields.sql)
-Line       : 1
-Statement  : alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text
-
-	at org.flywaydb.core.internal.command.DbMigrate.doMigrateGroup(DbMigrate.java:382)
-	at org.flywaydb.core.internal.command.DbMigrate.lambda$applyMigrations$1(DbMigrate.java:272)
-	at org.flywaydb.core.internal.jdbc.TransactionalExecutionTemplate.execute(TransactionalExecutionTemplate.java:55)
-	at org.flywaydb.core.internal.command.DbMigrate.applyMigrations(DbMigrate.java:271)
-	at org.flywaydb.core.internal.command.DbMigrate.migrateGroup(DbMigrate.java:244)
-	at org.flywaydb.core.internal.command.DbMigrate.lambda$migrateAll$0(DbMigrate.java:139)
-	at org.flywaydb.core.internal.jdbc.TableLockingExecutionTemplate$1.call(TableLockingExecutionTemplate.java:36)
-	at org.flywaydb.core.internal.jdbc.TransactionalExecutionTemplate.execute(TransactionalExecutionTemplate.java:55)
-	at org.flywaydb.core.internal.jdbc.TableLockingExecutionTemplate.execute(TableLockingExecutionTemplate.java:31)
-	at org.flywaydb.core.internal.database.base.Connection.lock(Connection.java:102)
-	at org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory.lock(JdbcTableSchemaHistory.java:144)
-	at org.flywaydb.core.internal.command.DbMigrate.migrateAll(DbMigrate.java:139)
-	at org.flywaydb.core.internal.command.DbMigrate.migrate(DbMigrate.java:97)
-	at org.flywaydb.core.Flyway.lambda$migrate$0(Flyway.java:188)
-	at org.flywaydb.core.FlywayExecutor.execute(FlywayExecutor.java:213)
-	at org.flywaydb.core.Flyway.migrate(Flyway.java:140)
-	at org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer.afterPropertiesSet(FlywayMigrationInitializer.java:66)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing column [accuracym] in table [telemetry_events]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:421)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1833)
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1782)
-	... 40 more
-Caused by: org.flywaydb.core.internal.sqlscript.FlywaySqlScriptException: Migration V3__device_extended_fields.sql failed
------------------------------------------------
-SQL State  : 42000
-Error Code : 42000
-Message    : Syntax error in SQL statement "alter table devices\000a  add column if not exists organisation_id uuid references organisations(id) on delete set null[*],\000a  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',\000a  add column if not exists firmware        varchar(32)  not null default 'unknown',\000a  add column if not exists sim_card        varchar(64),\000a  add column if not exists serial_no       varchar(64),\000a  add column if not exists vehicle_plate   varchar(64),\000a  add column if not exists status          varchar(32)  not null default 'Unassigned',\000a  add column if not exists notes           text"; SQL statement:
-alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text [42000-224]
-Location   : db/migration/V3__device_extended_fields.sql (/Users/mac/Documents/GitHub/tracpro/backend/target/classes/db/migration/V3__device_extended_fields.sql)
-Line       : 1
-Statement  : alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text
-
-	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.handleException(DefaultSqlScriptExecutor.java:267)
-	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.executeStatement(DefaultSqlScriptExecutor.java:222)
-	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.execute(DefaultSqlScriptExecutor.java:126)
-	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.executeOnce(SqlMigrationExecutor.java:68)
-	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.lambda$execute$0(SqlMigrationExecutor.java:57)
-	at org.flywaydb.core.internal.database.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:27)
-	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.execute(SqlMigrationExecutor.java:56)
-	at org.flywaydb.core.internal.command.DbMigrate.doMigrateGroup(DbMigrate.java:374)
-	... 58 more
-Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table devices\000a  add column if not exists organisation_id uuid references organisations(id) on delete set null[*],\000a  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',\000a  add column if not exists firmware        varchar(32)  not null default 'unknown',\000a  add column if not exists sim_card        varchar(64),\000a  add column if not exists serial_no       varchar(64),\000a  add column if not exists vehicle_plate   varchar(64),\000a  add column if not exists status          varchar(32)  not null default 'Unassigned',\000a  add column if not exists notes           text"; SQL statement:
-alter table devices
-  add column if not exists organisation_id uuid references organisations(id) on delete set null,
-  add column if not exists device_type     varchar(64)  not null default 'GPS Tracker',
-  add column if not exists firmware        varchar(32)  not null default 'unknown',
-  add column if not exists sim_card        varchar(64),
-  add column if not exists serial_no       varchar(64),
-  add column if not exists vehicle_plate   varchar(64),
-  add column if not exists status          varchar(32)  not null default 'Unassigned',
-  add column if not exists notes           text [42000-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	at org.h2.message.DbException.get(DbException.java:223)
-	at org.h2.message.DbException.get(DbException.java:199)
-	at org.h2.message.DbException.getSyntaxError(DbException.java:247)
-	at org.h2.command.ParserBase.getSyntaxError(ParserBase.java:748)
-	at org.h2.command.Parser.prepareCommand(Parser.java:486)
-	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:639)
-	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:559)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1166)
-	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:245)
-	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231)
-	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
-	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
-	at org.flywaydb.core.internal.jdbc.JdbcTemplate.executeStatement(JdbcTemplate.java:201)
-	at org.flywaydb.core.internal.sqlscript.ParsedSqlStatement.execute(ParsedSqlStatement.java:95)
-	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.executeStatement(DefaultSqlScriptExecutor.java:210)
-	... 64 more
+	... 38 more
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing column [accuracym] in table [telemetry_events]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:145)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:97)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:75)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:295)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:145)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:142)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:315)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:450)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1507)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	... 42 more
 

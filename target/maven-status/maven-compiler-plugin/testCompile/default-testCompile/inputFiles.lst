@@ -1,6 +1,9 @@
+/Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/scorecard/RollingScoreCalculatorTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/alert/rules/HarshDrivingRuleTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/AuthFlowIntegrationTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/alert/rules/OverspeedRuleTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/alert/rules/IdleTimeRuleTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/alert/rules/GeofenceRuleTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/DeviceApiIntegrationTest.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/scorecard/DriverScoreServiceTest.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/scorecard/ScoreCalculatorTest.java

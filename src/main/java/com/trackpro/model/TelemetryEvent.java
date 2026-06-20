@@ -30,17 +30,24 @@ public class TelemetryEvent {
 
     private Double latitude;
     private Double longitude;
+    @Column(name = "altitude_m")
     private Double altitudeM;
+    @Column(name = "speed_kph")
     private Double speedKph;
+    @Column(name = "heading_deg")
     private Double headingDeg;
+    @Column(name = "accuracy_m")
     private Double accuracyM;
     private Integer satellites;
     private Boolean ignition;
+    @Column(name = "voltage_mv")
     private Integer voltageMv;
+    @Column(name = "gsm_signal")
     private Integer gsmSignal;
+    @Column(name = "odometer_m")
     private Long odometerM;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "raw_payload", columnDefinition = "TEXT")
     private String rawPayload;
 
     public UUID getId() { return id; }

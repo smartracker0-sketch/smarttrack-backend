@@ -14,6 +14,7 @@ import com.trackpro.model.TelemetryEvent;
 import com.trackpro.repository.DeviceRepository;
 import com.trackpro.repository.FuelReadingRepository;
 import com.trackpro.repository.TelemetryEventRepository;
+import com.trackpro.trip.TripDetectionService;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class TelemetryService {
     private final Optional<DeviceStateCache> stateCache;
     private final Optional<IMqttClient> mqttClient;
     private final AlertRuleEvaluator alertRuleEvaluator;
+    private final TripDetectionService tripDetectionService;
 
     @Autowired
     public TelemetryService(
@@ -52,7 +54,8 @@ public class TelemetryService {
             ObjectMapper objectMapper,
             Optional<DeviceStateCache> stateCache,
             Optional<IMqttClient> mqttClient,
-            AlertRuleEvaluator alertRuleEvaluator
+            AlertRuleEvaluator alertRuleEvaluator,
+            TripDetectionService tripDetectionService
     ) {
         this.deviceRepository = deviceRepository;
         this.telemetryRepository = telemetryRepository;
@@ -63,6 +66,7 @@ public class TelemetryService {
         this.stateCache = stateCache;
         this.mqttClient = mqttClient;
         this.alertRuleEvaluator = alertRuleEvaluator;
+        this.tripDetectionService = tripDetectionService;
     }
 
     @Transactional
@@ -107,6 +111,7 @@ public class TelemetryService {
         ws.convertAndSend("/topic/telemetry", dto);
 
         alertRuleEvaluator.evaluate(frame, device);
+        tripDetectionService.processTelemetry(frame, device);
 
         return dto;
     }

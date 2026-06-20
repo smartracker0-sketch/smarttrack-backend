@@ -29,25 +29,28 @@ public class GeofenceEntity {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
+    @Column(name = "geofence_type", nullable = false, length = 32)
     private GeofenceType geofenceType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     private GeofenceSeverity severity = GeofenceSeverity.LOW;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(name = "geometry_json", columnDefinition = "TEXT", nullable = false)
     private String geometryJson;
 
+    @Column(name = "center_lat")
     private Double centerLat;
+    @Column(name = "center_lng")
     private Double centerLng;
+    @Column(name = "radius_m")
     private Double radiusM;
 
     @Column(nullable = false)
     private boolean active = true;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     public enum GeofenceType { CIRCLE, POLYGON }

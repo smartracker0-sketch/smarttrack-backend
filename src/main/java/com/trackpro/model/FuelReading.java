@@ -28,11 +28,14 @@ public class FuelReading {
     @Column(nullable = false)
     private Instant receivedAt = Instant.now();
 
+    @Column(name = "fuel_level_pct")
     private Double fuelLevelPct;
+    @Column(name = "fuel_liters")
     private Double fuelLiters;
+    @Column(name = "temperature_c")
     private Double temperatureC;
 
-    @Column(length = 32)
+    @Column(name = "tank_id", length = 32)
     private String tankId;
 
     public UUID getId() { return id; }

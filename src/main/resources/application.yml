@@ -64,6 +64,33 @@ trackpro:
       low-fuel-percent: 15
       drainage-threshold-percent: 10
       drainage-window-minutes: 5
+  scorecard:
+    starting-score: 100
+    deductions:
+      harsh-braking: 3
+      harsh-acceleration: 3
+      overspeed-medium: 5
+      overspeed-high: 10
+      idle-exceeded: 2
+      ignition-anomaly: 15
+      restricted-geofence-entry: 8
+      night-driving-per-10-min: 1
+    bonuses:
+      clean-trip: 5
+      smooth-streak-per-trip: 2
+      smooth-streak-min-trips: 5
+    rolling-average:
+      trip-window: 30
+      decay-factor: 0.95
+    night-driving:
+      enabled: false
+      start-hour: 23
+      end-hour: 5
+    bands:
+      excellent: 90
+      good: 75
+      fair: 60
+      poor: 40
 
 management:
   endpoints:

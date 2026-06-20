@@ -11,6 +11,7 @@ import com.trackpro.model.DeviceEntity;
 import com.trackpro.model.GeofenceEntity;
 import com.trackpro.repository.DeviceAlertRepository;
 import com.trackpro.repository.DeviceRepository;
+import com.trackpro.scorecard.DriverScoreService;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +36,7 @@ public class AlertService {
     private final TelemetryProperties props;
     private final ObjectMapper objectMapper;
     private final Optional<IMqttClient> mqttClient;
+    private final DriverScoreService driverScoreService;
 
     @Autowired
     public AlertService(
@@ -43,7 +45,8 @@ public class AlertService {
             SimpMessagingTemplate ws,
             TelemetryProperties props,
             ObjectMapper objectMapper,
-            Optional<IMqttClient> mqttClient
+            Optional<IMqttClient> mqttClient,
+            DriverScoreService driverScoreService
     ) {
         this.alertRepository = alertRepository;
         this.deviceRepository = deviceRepository;
@@ -51,6 +54,7 @@ public class AlertService {
         this.props = props;
         this.objectMapper = objectMapper;
         this.mqttClient = mqttClient;
+        this.driverScoreService = driverScoreService;
     }
 
     @Transactional
@@ -76,6 +80,12 @@ public class AlertService {
         DeviceAlert alert = toEntity(event, device);
         alertRepository.save(alert);
         broadcast(alert);
+
+        if (driverScoreService.isDrivingBehaviour(event.alertType())) {
+            driverScoreService.activeTripForDevice(device.getId()).ifPresent(tripId ->
+                    driverScoreService.recordEvent(tripId, event.alertType(), event.severity(),
+                            event.relatedGeofenceId() != null));
+        }
 
         if (event.severity() == AlertSeverity.HIGH || event.severity() == AlertSeverity.CRITICAL) {
             sendHighSeverityNotification(event);

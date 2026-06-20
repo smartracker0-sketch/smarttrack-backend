@@ -9,6 +9,7 @@ com/trackpro/model/RoleEntity.class
 com/trackpro/model/RefreshTokenEntity.class
 com/trackpro/repository/UserRepository.class
 com/trackpro/dto/location/LocationIngestRequest.class
+com/trackpro/scorecard/calculator/ScoreCalculator$1.class
 com/trackpro/dto/auth/LogoutRequest.class
 com/trackpro/config/WebSocketConfig.class
 com/trackpro/dto/location/LocationDto.class
@@ -19,3 +20,4 @@ com/trackpro/service/AuthService.class
 com/trackpro/model/LocationEntity.class
 com/trackpro/dto/auth/AuthResponse.class
 com/trackpro/dto/auth/RefreshRequest.class
+com/trackpro/scorecard/calculator/ScoreBandResolver$1.class

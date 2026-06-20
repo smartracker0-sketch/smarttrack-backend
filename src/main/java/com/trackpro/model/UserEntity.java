@@ -42,6 +42,18 @@ public class UserEntity {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(name = "score_total", precision = 5, scale = 2)
+    private java.math.BigDecimal scoreTotal = java.math.BigDecimal.valueOf(100.00);
+
+    @Column(name = "score_band", length = 20)
+    private String scoreBand = "EXCELLENT";
+
+    @Column(name = "total_trips_scored")
+    private Integer totalTripsScored = 0;
+
+    @Column(name = "last_scored_at")
+    private Instant lastScoredAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organisation_id")
     private com.trackpro.model.OrganisationEntity organisation;
@@ -56,6 +68,10 @@ public class UserEntity {
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -101,6 +117,15 @@ public class UserEntity {
     public Instant getCreatedAt() {
         return createdAt;
     }
+
+    public java.math.BigDecimal getScoreTotal() { return scoreTotal; }
+    public void setScoreTotal(java.math.BigDecimal scoreTotal) { this.scoreTotal = scoreTotal; }
+    public String getScoreBand() { return scoreBand; }
+    public void setScoreBand(String scoreBand) { this.scoreBand = scoreBand; }
+    public Integer getTotalTripsScored() { return totalTripsScored; }
+    public void setTotalTripsScored(Integer totalTripsScored) { this.totalTripsScored = totalTripsScored; }
+    public Instant getLastScoredAt() { return lastScoredAt; }
+    public void setLastScoredAt(Instant lastScoredAt) { this.lastScoredAt = lastScoredAt; }
 
     public Set<RoleEntity> getRoles() {
         return roles;
