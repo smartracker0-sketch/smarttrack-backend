@@ -51,6 +51,8 @@ public class DeviceEntity {
     @Column(nullable = false, length = 32)
     private String status = "Unassigned";
 
+    private Integer speedLimitKmh;
+
     @Column(columnDefinition = "TEXT")
     private String notes;
 
@@ -89,6 +91,9 @@ public class DeviceEntity {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Integer getSpeedLimitKmh() { return speedLimitKmh; }
+    public void setSpeedLimitKmh(Integer speedLimitKmh) { this.speedLimitKmh = speedLimitKmh; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

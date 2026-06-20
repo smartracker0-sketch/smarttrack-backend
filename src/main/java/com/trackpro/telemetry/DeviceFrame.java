@@ -20,6 +20,7 @@ public record DeviceFrame(
         Integer voltageMv,
         Integer gsmSignal,
         Long odometerM,
+        Double fuelLevelPct,
         String rawPayload
 ) {
     public static Builder builder() { return new Builder(); }
@@ -38,6 +39,7 @@ public record DeviceFrame(
         private Integer voltageMv;
         private Integer gsmSignal;
         private Long odometerM;
+        private Double fuelLevelPct;
         private String rawPayload;
 
         public Builder imei(String v)         { this.imei = v; return this; }
@@ -53,12 +55,13 @@ public record DeviceFrame(
         public Builder voltageMv(Integer v)   { this.voltageMv = v; return this; }
         public Builder gsmSignal(Integer v)   { this.gsmSignal = v; return this; }
         public Builder odometerM(Long v)      { this.odometerM = v; return this; }
+        public Builder fuelLevelPct(Double v) { this.fuelLevelPct = v; return this; }
         public Builder rawPayload(String v)   { this.rawPayload = v; return this; }
 
         public DeviceFrame build() {
             return new DeviceFrame(imei, eventTime, latitude, longitude, altitudeM,
                     speedKph, headingDeg, accuracyM, satellites, ignition,
-                    voltageMv, gsmSignal, odometerM, rawPayload);
+                    voltageMv, gsmSignal, odometerM, fuelLevelPct, rawPayload);
         }
     }
 }

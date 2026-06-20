@@ -1,6 +1,7 @@
 package com.trackpro.repository;
 
 import com.trackpro.model.DeviceEntity;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -13,4 +14,5 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
     Page<DeviceEntity> findByOwnerId(UUID ownerId, Pageable pageable);
     Optional<DeviceEntity> findByIdAndOwnerId(UUID id, UUID ownerId);
     Page<DeviceEntity> findByOrganisationId(UUID organisationId, Pageable pageable);
+    List<DeviceEntity> findByStatusNot(String status);
 }

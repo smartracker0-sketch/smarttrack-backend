@@ -118,6 +118,13 @@
             <artifactId>spring-integration-mqtt</artifactId>
         </dependency>
 
+        <!-- JTS — geofence point-in-polygon -->
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.19.0</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>

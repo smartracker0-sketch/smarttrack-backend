@@ -2,6 +2,7 @@ package com.trackpro.telemetry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.trackpro.alert.service.AlertRuleEvaluator;
 import com.trackpro.config.TelemetryProperties;
 import com.trackpro.dto.telemetry.DeviceAlertDto;
 import com.trackpro.dto.telemetry.FuelReadingDto;
@@ -10,7 +11,6 @@ import com.trackpro.model.DeviceAlert;
 import com.trackpro.model.DeviceEntity;
 import com.trackpro.model.FuelReading;
 import com.trackpro.model.TelemetryEvent;
-import com.trackpro.repository.DeviceAlertRepository;
 import com.trackpro.repository.DeviceRepository;
 import com.trackpro.repository.FuelReadingRepository;
 import com.trackpro.repository.TelemetryEventRepository;
@@ -35,34 +35,34 @@ public class TelemetryService {
     private final DeviceRepository deviceRepository;
     private final TelemetryEventRepository telemetryRepository;
     private final FuelReadingRepository fuelRepository;
-    private final DeviceAlertRepository alertRepository;
     private final SimpMessagingTemplate ws;
     private final TelemetryProperties props;
     private final ObjectMapper objectMapper;
     private final Optional<DeviceStateCache> stateCache;
     private final Optional<IMqttClient> mqttClient;
+    private final AlertRuleEvaluator alertRuleEvaluator;
 
     @Autowired
     public TelemetryService(
             DeviceRepository deviceRepository,
             TelemetryEventRepository telemetryRepository,
             FuelReadingRepository fuelRepository,
-            DeviceAlertRepository alertRepository,
             SimpMessagingTemplate ws,
             TelemetryProperties props,
             ObjectMapper objectMapper,
             Optional<DeviceStateCache> stateCache,
-            Optional<IMqttClient> mqttClient
+            Optional<IMqttClient> mqttClient,
+            AlertRuleEvaluator alertRuleEvaluator
     ) {
         this.deviceRepository = deviceRepository;
         this.telemetryRepository = telemetryRepository;
         this.fuelRepository = fuelRepository;
-        this.alertRepository = alertRepository;
         this.ws = ws;
         this.props = props;
         this.objectMapper = objectMapper;
         this.stateCache = stateCache;
         this.mqttClient = mqttClient;
+        this.alertRuleEvaluator = alertRuleEvaluator;
     }
 
     @Transactional
@@ -106,7 +106,7 @@ public class TelemetryService {
         ws.convertAndSend("/topic/devices/" + device.getId() + "/telemetry", dto);
         ws.convertAndSend("/topic/telemetry", dto);
 
-        checkAlerts(device, frame);
+        alertRuleEvaluator.evaluate(frame, device);
 
         return dto;
     }
@@ -132,37 +132,6 @@ public class TelemetryService {
         ws.convertAndSend("/topic/devices/" + device.getId() + "/fuel", dto);
         publishToMqtt(device.getId(), "fuel", dto);
         return dto;
-    }
-
-    private void checkAlerts(DeviceEntity device, DeviceFrame frame) {
-        if (frame.speedKph() != null && frame.speedKph() > 120.0) {
-            raiseAlert(device, "SPEEDING", "CRITICAL",
-                    String.format("Speed %.1f km/h exceeds limit", frame.speedKph()),
-                    frame.latitude(), frame.longitude());
-        }
-        if (frame.voltageMv() != null && frame.voltageMv() < 11500) {
-            raiseAlert(device, "LOW_BATTERY", "WARNING",
-                    String.format("Battery voltage low: %d mV", frame.voltageMv()),
-                    frame.latitude(), frame.longitude());
-        }
-    }
-
-    private void raiseAlert(DeviceEntity device, String type, String severity,
-                             String message, Double lat, Double lon) {
-        DeviceAlert alert = new DeviceAlert();
-        alert.setDevice(device);
-        alert.setAlertTime(Instant.now());
-        alert.setAlertType(type);
-        alert.setSeverity(severity);
-        alert.setMessage(message);
-        alert.setLatitude(lat);
-        alert.setLongitude(lon);
-        alertRepository.save(alert);
-
-        DeviceAlertDto dto = toAlertDto(alert);
-        ws.convertAndSend("/topic/devices/" + device.getId() + "/alerts", dto);
-        ws.convertAndSend("/topic/alerts", dto);
-        publishToMqtt(device.getId(), "alert", dto);
     }
 
     private void publishToMqtt(UUID deviceId, String subTopic, Object payload) {
@@ -196,7 +165,10 @@ public class TelemetryService {
         return new DeviceAlertDto(
                 a.getId(), a.getDevice().getId(), a.getAlertTime(), a.getReceivedAt(),
                 a.getAlertType(), a.getSeverity(), a.getMessage(),
-                a.isAcknowledged(), a.getAckAt(), a.getLatitude(), a.getLongitude()
+                a.isAcknowledged(), a.getAckAt(), a.getLatitude(), a.getLongitude(),
+                a.getSpeedKph(), a.getDurationSeconds(),
+                a.getRelatedGeofence() != null ? a.getRelatedGeofence().getId() : null,
+                a.getRelatedGeofence() != null ? a.getRelatedGeofence().getName() : null
         );
     }
 }

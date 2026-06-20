@@ -46,6 +46,26 @@ trackpro:
       password: ${TRACKPRO_MQTT_PASS:}
       topic-prefix: ${TRACKPRO_MQTT_TOPIC_PREFIX:trackpro/devices}
       enabled: ${TRACKPRO_MQTT_ENABLED:true}
+  alerts:
+    overspeed:
+      default-limit-kmh: 120
+      sustained-readings: 3
+      sustained-seconds: 10
+      debounce-minutes: 5
+    harsh-driving:
+      braking-threshold-ms2: -6.5
+      acceleration-threshold-ms2: 4.5
+    idle:
+      threshold-minutes: 10
+      escalation-minutes: 30
+      debounce-minutes: 30
+    device-offline:
+      threshold-minutes: 5
+      escalation-minutes: 60
+    fuel:
+      low-fuel-percent: 15
+      drainage-threshold-percent: 10
+      drainage-window-minutes: 5
 
 management:
   endpoints:

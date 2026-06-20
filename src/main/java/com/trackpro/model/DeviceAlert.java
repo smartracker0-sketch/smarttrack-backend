@@ -1,7 +1,11 @@
 package com.trackpro.model;
 
+import com.trackpro.alert.AlertSeverity;
+import com.trackpro.alert.AlertType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -28,11 +32,13 @@ public class DeviceAlert {
     @Column(nullable = false)
     private Instant receivedAt = Instant.now();
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 64)
-    private String alertType;
+    private AlertType alertType;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
-    private String severity = "WARNING";
+    private AlertSeverity severity = AlertSeverity.MEDIUM;
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -48,6 +54,16 @@ public class DeviceAlert {
 
     private Double latitude;
     private Double longitude;
+    private Double speedKph;
+
+    private Long durationSeconds;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "related_geofence_id")
+    private GeofenceEntity relatedGeofence;
+
+    @Column(columnDefinition = "TEXT")
+    private String metadata;
 
     public UUID getId() { return id; }
     public DeviceEntity getDevice() { return device; }
@@ -56,10 +72,10 @@ public class DeviceAlert {
     public void setAlertTime(Instant alertTime) { this.alertTime = alertTime; }
     public Instant getReceivedAt() { return receivedAt; }
     public void setReceivedAt(Instant receivedAt) { this.receivedAt = receivedAt; }
-    public String getAlertType() { return alertType; }
-    public void setAlertType(String alertType) { this.alertType = alertType; }
-    public String getSeverity() { return severity; }
-    public void setSeverity(String severity) { this.severity = severity; }
+    public AlertType getAlertType() { return alertType; }
+    public void setAlertType(AlertType alertType) { this.alertType = alertType; }
+    public AlertSeverity getSeverity() { return severity; }
+    public void setSeverity(AlertSeverity severity) { this.severity = severity; }
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
     public boolean isAcknowledged() { return acknowledged; }
@@ -72,4 +88,12 @@ public class DeviceAlert {
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public Double getSpeedKph() { return speedKph; }
+    public void setSpeedKph(Double speedKph) { this.speedKph = speedKph; }
+    public Long getDurationSeconds() { return durationSeconds; }
+    public void setDurationSeconds(Long durationSeconds) { this.durationSeconds = durationSeconds; }
+    public GeofenceEntity getRelatedGeofence() { return relatedGeofence; }
+    public void setRelatedGeofence(GeofenceEntity relatedGeofence) { this.relatedGeofence = relatedGeofence; }
+    public String getMetadata() { return metadata; }
+    public void setMetadata(String metadata) { this.metadata = metadata; }
 }

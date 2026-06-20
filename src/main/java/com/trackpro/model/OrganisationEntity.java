@@ -36,6 +36,10 @@ public class OrganisationEntity {
     @Column(nullable = false)
     private int vehicleLimit = 10;
 
+    private Integer defaultSpeedLimitKmh;
+    private Integer idleThresholdMinutes;
+    private Integer idleEscalationMinutes;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -63,6 +67,15 @@ public class OrganisationEntity {
 
     public int getVehicleLimit() { return vehicleLimit; }
     public void setVehicleLimit(int vehicleLimit) { this.vehicleLimit = vehicleLimit; }
+
+    public Integer getDefaultSpeedLimitKmh() { return defaultSpeedLimitKmh; }
+    public void setDefaultSpeedLimitKmh(Integer defaultSpeedLimitKmh) { this.defaultSpeedLimitKmh = defaultSpeedLimitKmh; }
+
+    public Integer getIdleThresholdMinutes() { return idleThresholdMinutes; }
+    public void setIdleThresholdMinutes(Integer idleThresholdMinutes) { this.idleThresholdMinutes = idleThresholdMinutes; }
+
+    public Integer getIdleEscalationMinutes() { return idleEscalationMinutes; }
+    public void setIdleEscalationMinutes(Integer idleEscalationMinutes) { this.idleEscalationMinutes = idleEscalationMinutes; }
 
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
