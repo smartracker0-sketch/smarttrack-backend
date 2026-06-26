@@ -30,14 +30,45 @@ obtain_ssl() {
   source .env
   echo "🔒  Obtaining SSL certificate for ${DOMAIN}..."
 
-  # Start nginx on HTTP only first (no SSL config yet)
-  $COMPOSE up -d nginx
+  # Temporarily replace nginx config with HTTP-only (no ssl_certificate lines)
+  # so nginx can start and serve the certbot challenge before certs exist
+  cat > /tmp/certbot-bootstrap.conf << 'NGINXEOF'
+server {
+    listen 80;
+    server_name _;
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        return 200 'ok';
+        add_header Content-Type text/plain;
+    }
+}
+NGINXEOF
+
+  # Mount the bootstrap config over the real one temporarily
+  docker run -d --name certbot-nginx \
+    -p 80:80 \
+    -v /tmp/certbot-bootstrap.conf:/etc/nginx/conf.d/default.conf:ro \
+    -v smarttrack-backend_certbot_www:/var/www/certbot \
+    nginx:alpine
+
+  echo "⏳  Waiting for bootstrap nginx..."
+  sleep 5
 
   # Run certbot
-  $COMPOSE run --rm certbot
+  docker run --rm \
+    -v smarttrack-backend_certbot_www:/var/www/certbot \
+    -v smarttrack-backend_certbot_certs:/etc/letsencrypt \
+    certbot/certbot certonly --webroot \
+    --webroot-path=/var/www/certbot \
+    --email "${CERTBOT_EMAIL}" \
+    --agree-tos --no-eff-email \
+    -d "${DOMAIN}"
 
-  # Reload nginx with full SSL config
-  $COMPOSE exec nginx nginx -s reload
+  # Stop bootstrap nginx
+  docker stop certbot-nginx && docker rm certbot-nginx
+
   echo "✅  SSL certificate obtained."
 }
 
