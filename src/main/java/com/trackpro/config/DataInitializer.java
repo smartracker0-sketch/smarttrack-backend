@@ -52,17 +52,19 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     private void ensureAdminUser() {
-        if (userRepository.existsByEmailIgnoreCase(adminProps.email())) {
-            return;
-        }
         RoleEntity adminRole = roleRepository.findByName(RoleName.SUPER_ADMIN).orElseThrow();
-        UserEntity user = new UserEntity();
-        user.setEmail(adminProps.email());
-        user.setPasswordHash(passwordEncoder.encode(adminProps.password()));
-        user.setDisplayName(adminProps.displayName());
-        user.setEnabled(true);
-        user.setRoles(new LinkedHashSet<>());
-        user.getRoles().add(adminRole);
-        userRepository.save(user);
+        UserEntity user = userRepository.findByEmailIgnoreCase(adminProps.email()).orElseGet(() -> {
+            UserEntity u = new UserEntity();
+            u.setEmail(adminProps.email());
+            u.setPasswordHash(passwordEncoder.encode(adminProps.password()));
+            u.setDisplayName(adminProps.displayName());
+            u.setEnabled(true);
+            u.setRoles(new LinkedHashSet<>());
+            return u;
+        });
+        if (user.getRoles().stream().noneMatch(r -> r.getName() == RoleName.SUPER_ADMIN)) {
+            user.getRoles().add(adminRole);
+            userRepository.save(user);
+        }
     }
 }

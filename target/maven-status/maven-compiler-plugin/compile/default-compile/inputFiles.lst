@@ -23,6 +23,7 @@
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/alert/config/AlertThresholds.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/repository/TelemetryEventRepository.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/alert/rules/FuelAnomalyRule.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/controller/UserController.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/repository/RoleRepository.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/config/AsyncConfig.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/admin/AdminCreateUserRequest.java
@@ -78,6 +79,7 @@
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/exception/NotFoundException.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/device/DeviceCreateRequest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/auth/LoginRequest.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/user/UserMeResponse.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/alert/rules/HarshDrivingRule.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/config/SecurityConfig.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/config/TrackProSecurityProperties.java
