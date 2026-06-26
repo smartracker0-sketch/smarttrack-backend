@@ -28,10 +28,10 @@ public class OverspeedRule implements AlertRule {
 
     private static final Logger log = LoggerFactory.getLogger(OverspeedRule.class);
 
-    private final AlertRuleCache cache;
+    private final Optional<AlertRuleCache> cache;
     private final AlertThresholds thresholds;
 
-    public OverspeedRule(AlertRuleCache cache, AlertThresholds thresholds) {
+    public OverspeedRule(Optional<AlertRuleCache> cache, AlertThresholds thresholds) {
         this.cache = cache;
         this.thresholds = thresholds;
     }
@@ -60,7 +60,9 @@ public class OverspeedRule implements AlertRule {
         }
 
         // Debounce: don't fire again within debounce window
-        Optional<Instant> lastFired = cache.getLastAlertTime(deviceId, AlertType.OVERSPEED);
+        if (cache.isEmpty()) return Collections.emptyList();
+        AlertRuleCache c = cache.get();
+        Optional<Instant> lastFired = c.getLastAlertTime(deviceId, AlertType.OVERSPEED);
         int debounceMinutes = thresholds.overspeed().debounceMinutes();
         if (lastFired.isPresent() && Duration.between(lastFired.get(), now).toMinutes() < debounceMinutes) {
             return Collections.emptyList(); // duration update handled by AlertService for existing open alert
@@ -69,7 +71,7 @@ public class OverspeedRule implements AlertRule {
         AlertSeverity severity = severity(current.speedKph(), limit);
         String message = String.format("Overspeed: %.1f km/h (limit %.1f km/h)", current.speedKph(), limit);
 
-        cache.setLastAlertTime(deviceId, AlertType.OVERSPEED, now);
+        c.setLastAlertTime(deviceId, AlertType.OVERSPEED, now);
 
         return List.of(AlertEvent.builder()
                 .deviceId(deviceId)
@@ -89,13 +91,15 @@ public class OverspeedRule implements AlertRule {
         int sustainedReadings = thresholds.overspeed().sustainedReadings();
         double sustainedSeconds = thresholds.overspeed().sustainedSeconds();
 
-        long count = cache.getCounter(deviceId, "overspeed");
+        if (cache.isEmpty()) return false;
+        AlertRuleCache c = cache.get();
+        long count = c.getCounter(deviceId, "overspeed");
         if (previous != null && previous.speedKph() != null && previous.speedKph() > limit) {
             count++;
         } else {
             count = 1;
         }
-        cache.setCounter(deviceId, "overspeed", count);
+        c.setCounter(deviceId, "overspeed", count);
 
         if (count >= sustainedReadings) {
             return true;

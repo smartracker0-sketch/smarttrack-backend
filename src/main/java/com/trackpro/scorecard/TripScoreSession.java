@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
  * Avoids hitting Postgres on every alert event.
  */
 @Component
+@ConditionalOnBean(StringRedisTemplate.class)
 public class TripScoreSession {
 
     private static final Logger log = LoggerFactory.getLogger(TripScoreSession.class);

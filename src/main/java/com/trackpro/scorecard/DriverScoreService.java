@@ -17,6 +17,7 @@ import com.trackpro.scorecard.config.ScorecardConfig;
 import com.trackpro.scorecard.dto.DriverScoreUpdated;
 import com.trackpro.scorecard.dto.TripScoreBreakdown;
 import java.math.BigDecimal;
+import org.springframework.lang.Nullable;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -35,6 +36,7 @@ public class DriverScoreService {
 
     private static final Logger log = LoggerFactory.getLogger(DriverScoreService.class);
 
+    @Nullable
     private final TripScoreSession session;
     private final ScoreCalculator scoreCalculator;
     private final ScoreBandResolver bandResolver;
@@ -46,7 +48,7 @@ public class DriverScoreService {
     private final SimpMessagingTemplate ws;
     private final ObjectMapper objectMapper;
 
-    public DriverScoreService(TripScoreSession session,
+    public DriverScoreService(@Nullable TripScoreSession session,
                               ScoreCalculator scoreCalculator,
                               ScoreBandResolver bandResolver,
                               RollingScoreCalculator rollingScoreCalculator,
@@ -76,6 +78,10 @@ public class DriverScoreService {
 
     @Transactional
     public void recordEvent(UUID tripId, AlertType type, AlertSeverity severity, boolean restrictedGeofence) {
+        if (session == null) {
+            log.debug("TripScoreSession unavailable (no Redis); skipping score event");
+            return;
+        }
         Optional<TripEntity> tripOpt = tripRepository.findById(tripId);
         if (tripOpt.isEmpty()) {
             log.warn("No trip found for score event: {}", tripId);
@@ -105,6 +111,7 @@ public class DriverScoreService {
     }
 
     public void recordNightDriving(UUID tripId, ZonedDateTime ts) {
+        if (session == null) return;
         int penalty = scoreCalculator.nightDrivingPenalty(ts);
         if (penalty <= 0) return;
         TripScoreSession.Session s = session.createOrRead(tripId, config.startingScore());
@@ -120,6 +127,10 @@ public class DriverScoreService {
 
     @Transactional
     public void finalizeTripScore(UUID tripId) {
+        if (session == null) {
+            log.debug("TripScoreSession unavailable (no Redis); skipping trip finalization");
+            return;
+        }
         TripScoreSession.Session s = session.read(tripId);
         if (s == null) {
             log.warn("No active score session for trip {}; skipping finalization", tripId);
@@ -178,7 +189,7 @@ public class DriverScoreService {
         trip.setStatus("ABANDONED");
         trip.setEndedAt(Instant.now());
         tripRepository.save(trip);
-        session.delete(trip.getId());
+        if (session != null) session.delete(trip.getId());
     }
 
     public void applyOverride(UUID tripId, Integer adjustedScore, String reason) {

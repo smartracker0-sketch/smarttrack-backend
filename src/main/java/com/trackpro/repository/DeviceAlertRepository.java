@@ -1,6 +1,7 @@
 package com.trackpro.repository;
 
 import com.trackpro.model.DeviceAlert;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -17,8 +18,8 @@ public interface DeviceAlertRepository extends JpaRepository<DeviceAlert, UUID> 
     List<DeviceAlert> findByDeviceIdAndAcknowledgedFalseOrderByAlertTimeDesc(UUID deviceId);
 
     @Modifying
-    @Query("update DeviceAlert a set a.acknowledged = true, a.ackAt = current_timestamp, a.ackBy = :user where a.id = :id")
-    int acknowledge(@Param("id") UUID id, @Param("user") com.trackpro.model.UserEntity user);
+    @Query("update DeviceAlert a set a.acknowledged = true, a.ackAt = :now, a.ackBy = :user where a.id = :id")
+    int acknowledge(@Param("id") UUID id, @Param("user") com.trackpro.model.UserEntity user, @Param("now") Instant now);
 
     List<DeviceAlert> findTop2ByDeviceIdAndAlertTypeAndAcknowledgedFalseOrderByAlertTimeDesc(UUID deviceId, com.trackpro.alert.AlertType alertType);
 }

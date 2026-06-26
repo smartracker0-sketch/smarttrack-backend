@@ -30,7 +30,7 @@ class IdleTimeRuleTest {
     @Test
     void firesAfterThresholdCrossedWithDebounce() {
         AlertRuleCache cache = mock(AlertRuleCache.class);
-        IdleTimeRule rule = new IdleTimeRule(cache, thresholds);
+        IdleTimeRule rule = new IdleTimeRule(Optional.of(cache), thresholds);
         DeviceEntity device = device();
         Instant now = Instant.now();
         when(cache.getIdleSince(device.getId())).thenReturn(Optional.of(now.minusSeconds(601)));
@@ -45,7 +45,7 @@ class IdleTimeRuleTest {
     @Test
     void doesNotFireWithinDebounceWindow() {
         AlertRuleCache cache = mock(AlertRuleCache.class);
-        IdleTimeRule rule = new IdleTimeRule(cache, thresholds);
+        IdleTimeRule rule = new IdleTimeRule(Optional.of(cache), thresholds);
         DeviceEntity device = device();
         Instant now = Instant.now();
         when(cache.getIdleSince(device.getId())).thenReturn(Optional.of(now.minusSeconds(601)));
@@ -60,7 +60,7 @@ class IdleTimeRuleTest {
     @Test
     void escalatesAfterEscalationThreshold() {
         AlertRuleCache cache = mock(AlertRuleCache.class);
-        IdleTimeRule rule = new IdleTimeRule(cache, thresholds);
+        IdleTimeRule rule = new IdleTimeRule(Optional.of(cache), thresholds);
         DeviceEntity device = device();
         Instant now = Instant.now();
         when(cache.getIdleSince(device.getId())).thenReturn(Optional.of(now.minusSeconds(1801)));

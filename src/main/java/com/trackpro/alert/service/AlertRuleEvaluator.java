@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -26,13 +27,14 @@ public class AlertRuleEvaluator {
     private final List<AlertRule> rules;
     private final AlertRuleContext context;
     private final AlertService alertService;
+    @Nullable
     private final AlertRuleCache cache;
 
     @Autowired
     public AlertRuleEvaluator(List<AlertRule> rules,
                               AlertRuleContext context,
                               AlertService alertService,
-                              AlertRuleCache cache) {
+                              @Nullable AlertRuleCache cache) {
         this.rules = rules;
         this.context = context;
         this.alertService = alertService;
@@ -57,12 +59,15 @@ public class AlertRuleEvaluator {
         } catch (Exception e) {
             log.error("Alert rule evaluation failed for device {}: {}", device.getId(), e.getMessage(), e);
         } finally {
-            cache.setLastSeen(device.getId(), payload.eventTime() != null ? payload.eventTime() : java.time.Instant.now());
-            cache.setLastLocation(device.getId(), toDto(payload, device));
+            if (cache != null) {
+                cache.setLastSeen(device.getId(), payload.eventTime() != null ? payload.eventTime() : java.time.Instant.now());
+                cache.setLastLocation(device.getId(), toDto(payload, device));
+            }
         }
     }
 
     private DeviceFrame loadPreviousFrame(UUID deviceId) {
+        if (cache == null) return null;
         return cache.getLastLocation(deviceId)
                 .map(this::toFrame)
                 .orElse(null);

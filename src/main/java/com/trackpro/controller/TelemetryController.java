@@ -114,7 +114,7 @@ public class TelemetryController {
                 .orElseThrow(() -> new NotFoundException("Alert not found"));
         assertOwnsDevice(alert.getDevice().getId());
         var user = userRepository.findById(userId).orElseThrow();
-        alertRepository.acknowledge(alertId, user);
+        alertRepository.acknowledge(alertId, user, java.time.Instant.now());
         return Map.of("acknowledged", true, "alertId", alertId);
     }
 

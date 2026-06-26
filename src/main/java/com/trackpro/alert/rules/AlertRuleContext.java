@@ -7,6 +7,7 @@ import com.trackpro.repository.GeofenceRepository;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,11 +18,12 @@ import org.springframework.stereotype.Component;
 public class AlertRuleContext {
 
     private final AlertThresholds thresholds;
+    @Nullable
     private final AlertRuleCache cache;
     private final GeofenceRepository geofenceRepository;
 
     public AlertRuleContext(AlertThresholds thresholds,
-                            AlertRuleCache cache,
+                            @Nullable AlertRuleCache cache,
                             GeofenceRepository geofenceRepository) {
         this.thresholds = thresholds;
         this.cache = cache;
@@ -32,6 +34,7 @@ public class AlertRuleContext {
         return thresholds;
     }
 
+    @Nullable
     public AlertRuleCache cache() {
         return cache;
     }

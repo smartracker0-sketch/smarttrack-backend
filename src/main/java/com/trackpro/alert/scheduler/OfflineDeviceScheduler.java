@@ -11,6 +11,7 @@ import com.trackpro.repository.DeviceRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,12 @@ public class OfflineDeviceScheduler {
     private static final Logger log = LoggerFactory.getLogger(OfflineDeviceScheduler.class);
 
     private final DeviceRepository deviceRepository;
-    private final AlertRuleCache cache;
+    private final Optional<AlertRuleCache> cache;
     private final AlertService alertService;
     private final AlertThresholds thresholds;
 
     public OfflineDeviceScheduler(DeviceRepository deviceRepository,
-                                  AlertRuleCache cache,
+                                  Optional<AlertRuleCache> cache,
                                   AlertService alertService,
                                   AlertThresholds thresholds) {
         this.deviceRepository = deviceRepository;
@@ -43,6 +44,8 @@ public class OfflineDeviceScheduler {
 
     @Scheduled(fixedRate = 60000)
     public void checkOfflineDevices() {
+        if (cache.isEmpty()) return;
+        AlertRuleCache c = cache.get();
         Instant now = Instant.now();
         int thresholdMinutes = thresholds.deviceOffline().thresholdMinutes();
         int escalationMinutes = thresholds.deviceOffline().escalationMinutes();
@@ -50,11 +53,11 @@ public class OfflineDeviceScheduler {
         List<DeviceEntity> activeDevices = deviceRepository.findByStatusNot("Offline");
         for (DeviceEntity device : activeDevices) {
             UUID deviceId = device.getId();
-            Instant lastSeen = cache.getLastSeen(deviceId).orElse(device.getCreatedAt());
+            Instant lastSeen = c.getLastSeen(deviceId).orElse(device.getCreatedAt());
             long offlineMinutes = Duration.between(lastSeen, now).toMinutes();
 
             if (offlineMinutes > thresholdMinutes) {
-                if (!cache.isOfflineAlertSent(deviceId)) {
+                if (!c.isOfflineAlertSent(deviceId)) {
                     AlertSeverity severity = offlineMinutes > escalationMinutes ? AlertSeverity.HIGH : AlertSeverity.MEDIUM;
                     AlertEvent event = AlertEvent.builder()
                             .deviceId(deviceId)
@@ -67,11 +70,11 @@ public class OfflineDeviceScheduler {
                             .durationSeconds(Duration.between(lastSeen, now).getSeconds())
                             .build();
                     alertService.fire(event);
-                    cache.setOfflineAlertSent(deviceId, true);
+                    c.setOfflineAlertSent(deviceId, true);
                 }
             } else {
-                if (cache.isOfflineAlertSent(deviceId)) {
-                    cache.setOfflineAlertSent(deviceId, false);
+                if (c.isOfflineAlertSent(deviceId)) {
+                    c.setOfflineAlertSent(deviceId, false);
                 }
             }
         }

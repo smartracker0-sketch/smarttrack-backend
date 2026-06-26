@@ -23,10 +23,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class FuelAnomalyRule implements AlertRule {
 
-    private final AlertRuleCache cache;
+    private final Optional<AlertRuleCache> cache;
     private final AlertThresholds thresholds;
 
-    public FuelAnomalyRule(AlertRuleCache cache, AlertThresholds thresholds) {
+    public FuelAnomalyRule(Optional<AlertRuleCache> cache, AlertThresholds thresholds) {
         this.cache = cache;
         this.thresholds = thresholds;
     }
@@ -63,7 +63,9 @@ public class FuelAnomalyRule implements AlertRule {
         }
 
         // Drainage detection
-        Optional<AlertRuleCache.FuelLevel> lastOpt = cache.getLastFuelLevel(deviceId);
+        if (cache.isEmpty()) return events;
+        AlertRuleCache c = cache.get();
+        Optional<AlertRuleCache.FuelLevel> lastOpt = c.getLastFuelLevel(deviceId);
         if (lastOpt.isPresent()) {
             AlertRuleCache.FuelLevel last = lastOpt.get();
             double drop = last.levelPct() - currentLevel;
@@ -87,7 +89,7 @@ public class FuelAnomalyRule implements AlertRule {
             }
         }
 
-        cache.setLastFuelLevel(deviceId, currentLevel, now);
+        c.setLastFuelLevel(deviceId, currentLevel, now);
         return events;
     }
 

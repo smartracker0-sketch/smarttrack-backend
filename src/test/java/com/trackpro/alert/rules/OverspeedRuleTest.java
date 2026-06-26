@@ -36,7 +36,7 @@ class OverspeedRuleTest {
                 new AlertThresholds.DeviceOffline(5, 60),
                 new AlertThresholds.Fuel(15, 10.0, 5)
         );
-        rule = new OverspeedRule(cache, thresholds);
+        rule = new OverspeedRule(java.util.Optional.of(cache), thresholds);
         device = new DeviceEntity();
         device.setId(UUID.randomUUID());
         device.setImei("123456789012345");

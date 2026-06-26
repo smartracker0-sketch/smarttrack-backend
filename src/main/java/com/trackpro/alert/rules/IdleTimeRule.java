@@ -25,10 +25,10 @@ public class IdleTimeRule implements AlertRule {
 
     private static final double IDLE_SPEED_KMH = 2.0;
 
-    private final AlertRuleCache cache;
+    private final Optional<AlertRuleCache> cache;
     private final AlertThresholds thresholds;
 
-    public IdleTimeRule(AlertRuleCache cache, AlertThresholds thresholds) {
+    public IdleTimeRule(Optional<AlertRuleCache> cache, AlertThresholds thresholds) {
         this.cache = cache;
         this.thresholds = thresholds;
     }
@@ -52,13 +52,15 @@ public class IdleTimeRule implements AlertRule {
         int escalationMinutes = resolveEscalation(device);
         int debounceMinutes = thresholds.idle().debounceMinutes();
 
-        Optional<Instant> idleSince = cache.getIdleSince(deviceId);
-        Optional<Instant> lastFired = cache.getLastAlertTime(deviceId, AlertType.IDLE_EXCEEDED);
+        if (cache.isEmpty()) return Collections.emptyList();
+        AlertRuleCache c = cache.get();
+        Optional<Instant> idleSince = c.getIdleSince(deviceId);
+        Optional<Instant> lastFired = c.getLastAlertTime(deviceId, AlertType.IDLE_EXCEEDED);
 
         if (isIdle) {
             Instant start = idleSince.orElse(now);
             if (idleSince.isEmpty()) {
-                cache.setIdleSince(deviceId, start);
+                c.setIdleSince(deviceId, start);
             }
             long idleMinutes = Duration.between(start, now).toMinutes();
 
@@ -67,7 +69,7 @@ public class IdleTimeRule implements AlertRule {
                 if (lastFired.isPresent() && Duration.between(lastFired.get(), now).toMinutes() < debounceMinutes) {
                     return Collections.emptyList();
                 }
-                cache.setLastAlertTime(deviceId, AlertType.IDLE_EXCEEDED, now);
+                c.setLastAlertTime(deviceId, AlertType.IDLE_EXCEEDED, now);
                 AlertSeverity severity = idleMinutes >= escalationMinutes ? AlertSeverity.MEDIUM : AlertSeverity.LOW;
                 return List.of(AlertEvent.builder()
                         .deviceId(deviceId)
@@ -83,7 +85,7 @@ public class IdleTimeRule implements AlertRule {
                         .build());
             }
         } else {
-            cache.clearIdleSince(deviceId);
+            c.clearIdleSince(deviceId);
         }
         return Collections.emptyList();
     }
