@@ -56,6 +56,15 @@ public class AdminDeviceController {
         return service.assignOrganisation(id, UUID.fromString(orgIdStr));
     }
 
+    @PatchMapping("/{id}/assign-user")
+    public AdminDeviceDto assignUser(@PathVariable UUID id, @RequestBody Map<String, String> body) {
+        String userIdStr = body.get("userId");
+        if (userIdStr == null || userIdStr.isBlank()) {
+            throw new com.trackpro.exception.BadRequestException("userId is required");
+        }
+        return service.assignUser(id, UUID.fromString(userIdStr));
+    }
+
     @PatchMapping("/{id}/unassign")
     public AdminDeviceDto unassign(@PathVariable UUID id) {
         return service.unassign(id);

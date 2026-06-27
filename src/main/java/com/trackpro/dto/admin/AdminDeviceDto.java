@@ -17,5 +17,6 @@ public record AdminDeviceDto(
         UUID organisationId,
         String organisationName,
         UUID ownerId,
+        String ownerName,
         Instant createdAt
 ) {}

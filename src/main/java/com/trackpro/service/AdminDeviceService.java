@@ -7,6 +7,7 @@ import com.trackpro.exception.NotFoundException;
 import com.trackpro.model.DeviceEntity;
 import com.trackpro.repository.DeviceRepository;
 import com.trackpro.repository.OrganisationRepository;
+import com.trackpro.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,12 @@ public class AdminDeviceService {
 
     private final DeviceRepository deviceRepository;
     private final OrganisationRepository orgRepository;
+    private final UserRepository userRepository;
 
-    public AdminDeviceService(DeviceRepository deviceRepository, OrganisationRepository orgRepository) {
+    public AdminDeviceService(DeviceRepository deviceRepository, OrganisationRepository orgRepository, UserRepository userRepository) {
         this.deviceRepository = deviceRepository;
         this.orgRepository = orgRepository;
+        this.userRepository = userRepository;
     }
 
     public Page<AdminDeviceDto> list(Pageable pageable) {
@@ -77,6 +80,17 @@ public class AdminDeviceService {
     }
 
     @Transactional
+    public AdminDeviceDto assignUser(UUID deviceId, UUID userId) {
+        DeviceEntity d = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new NotFoundException("Device not found"));
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        d.setOwner(user);
+        d.setStatus("Assigned");
+        return toDto(deviceRepository.save(d));
+    }
+
+    @Transactional
     public AdminDeviceDto unassign(UUID deviceId) {
         DeviceEntity d = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found"));
@@ -104,6 +118,7 @@ public class AdminDeviceService {
                 org != null ? org.getId() : null,
                 org != null ? org.getName() : null,
                 owner != null ? owner.getId() : null,
+                owner != null ? owner.getDisplayName() : null,
                 d.getCreatedAt()
         );
     }
