@@ -11,6 +11,7 @@ public record AdminBulkDeviceRequest(
         String simCard,
         String serialNo,
         UUID organisationId,
+        UUID userId,
         String vehiclePlate,
         String notes,
         String simNumber,

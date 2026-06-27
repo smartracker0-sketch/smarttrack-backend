@@ -48,6 +48,9 @@ public class AdminDeviceService {
         var org = req.organisationId() != null
                 ? orgRepository.findById(req.organisationId()).orElseThrow(() -> new NotFoundException("Organisation not found"))
                 : null;
+        var user = req.userId() != null
+                ? userRepository.findById(req.userId()).orElseThrow(() -> new NotFoundException("User not found"))
+                : null;
 
         List<AdminDeviceDto> result = new ArrayList<>();
         for (String rawImei : req.imeis()) {
@@ -71,8 +74,12 @@ public class AdminDeviceService {
             if (req.simApn() != null) d.setSimApn(req.simApn());
             if (req.manufacturer() != null) d.setManufacturer(req.manufacturer());
             d.setOrganisation(org);
-            d.setStatus(org != null ? "Assigned" : "Unassigned");
-            result.add(toDto(deviceRepository.save(d)));
+            d.setOwner(user);
+            boolean assigned = org != null || user != null;
+            d.setStatus(assigned ? "Assigned" : "Unassigned");
+            DeviceEntity saved = deviceRepository.save(d);
+            if (assigned) activationService.initiateCheck(saved);
+            result.add(toDto(saved));
         }
         return result;
     }
