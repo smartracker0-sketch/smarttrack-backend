@@ -64,6 +64,20 @@ trackpro:
       low-fuel-percent: 15
       drainage-threshold-percent: 10
       drainage-window-minutes: 5
+  sms:
+    provider: termii
+    termii:
+      api-key: ${TERMII_API_KEY:}
+      sender-id: ${TERMII_SENDER_ID:N-Alert}
+      base-url: ${TERMII_BASE_URL:https://api.ng.termii.com}
+    activation:
+      command: STATUS
+      timeout-minutes: 5
+      retry-attempts: 2
+      retry-interval-minutes: 3
+    server:
+      host: ${TRACKPRO_SERVER_HOST:}
+      tcp-port: ${TRACKPRO_TCP_PORT:5023}
   scorecard:
     starting-score: 100
     deductions:

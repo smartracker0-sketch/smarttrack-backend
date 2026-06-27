@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/v1/sms/inbound").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )

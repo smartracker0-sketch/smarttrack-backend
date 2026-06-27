@@ -56,6 +56,34 @@ public class DeviceEntity {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(length = 20)
+    private String simNumber;
+
+    @Column(length = 64)
+    private String simApn;
+
+    @Column(length = 64)
+    private String manufacturer;
+
+    @Column(nullable = false, length = 30)
+    private String activationStatus = "UNACTIVATED";
+
+    @Column(nullable = false)
+    private int activationAttempts = 0;
+
+    private Instant activationAttemptedAt;
+
+    private Instant activationConfirmedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String lastSmsReply;
+
+    @Column(nullable = false)
+    private boolean serverConfigured = false;
+
+    @Column(nullable = false)
+    private boolean apnConfigured = false;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -98,6 +126,36 @@ public class DeviceEntity {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getSimNumber() { return simNumber; }
+    public void setSimNumber(String simNumber) { this.simNumber = simNumber; }
+
+    public String getSimApn() { return simApn; }
+    public void setSimApn(String simApn) { this.simApn = simApn; }
+
+    public String getManufacturer() { return manufacturer; }
+    public void setManufacturer(String manufacturer) { this.manufacturer = manufacturer; }
+
+    public String getActivationStatus() { return activationStatus; }
+    public void setActivationStatus(String activationStatus) { this.activationStatus = activationStatus; }
+
+    public int getActivationAttempts() { return activationAttempts; }
+    public void setActivationAttempts(int activationAttempts) { this.activationAttempts = activationAttempts; }
+
+    public Instant getActivationAttemptedAt() { return activationAttemptedAt; }
+    public void setActivationAttemptedAt(Instant activationAttemptedAt) { this.activationAttemptedAt = activationAttemptedAt; }
+
+    public Instant getActivationConfirmedAt() { return activationConfirmedAt; }
+    public void setActivationConfirmedAt(Instant activationConfirmedAt) { this.activationConfirmedAt = activationConfirmedAt; }
+
+    public String getLastSmsReply() { return lastSmsReply; }
+    public void setLastSmsReply(String lastSmsReply) { this.lastSmsReply = lastSmsReply; }
+
+    public boolean isServerConfigured() { return serverConfigured; }
+    public void setServerConfigured(boolean serverConfigured) { this.serverConfigured = serverConfigured; }
+
+    public boolean isApnConfigured() { return apnConfigured; }
+    public void setApnConfigured(boolean apnConfigured) { this.apnConfigured = apnConfigured; }
 
     public Instant getCreatedAt() { return createdAt; }
 }

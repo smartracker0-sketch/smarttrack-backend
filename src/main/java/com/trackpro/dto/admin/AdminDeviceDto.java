@@ -18,5 +18,14 @@ public record AdminDeviceDto(
         String organisationName,
         UUID ownerId,
         String ownerName,
+        String simNumber,
+        String manufacturer,
+        String activationStatus,
+        int activationAttempts,
+        Instant activationAttemptedAt,
+        Instant activationConfirmedAt,
+        String lastSmsReply,
+        boolean serverConfigured,
+        boolean apnConfigured,
         Instant createdAt
 ) {}

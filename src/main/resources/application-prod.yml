@@ -31,6 +31,12 @@ trackpro:
     jwt:
       access-token-ttl: PT1H
       refresh-token-ttl: P30D
+  sms:
+    termii:
+      api-key: ${TERMII_API_KEY}
+      sender-id: ${TERMII_SENDER_ID}
+    server:
+      host: ${TRACKPRO_SERVER_HOST}
 
 management:
   endpoints:

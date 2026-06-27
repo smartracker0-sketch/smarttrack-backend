@@ -1,6 +1,7 @@
 package com.trackpro.repository;
 
 import com.trackpro.model.DeviceEntity;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,4 +17,6 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
     Page<DeviceEntity> findByOrganisationId(UUID organisationId, Pageable pageable);
     List<DeviceEntity> findByStatusNot(String status);
     long countByStatus(String status);
+    List<DeviceEntity> findByActivationStatusAndActivationAttemptedAtBefore(String activationStatus, Instant before);
+    Optional<DeviceEntity> findBySimNumber(String simNumber);
 }

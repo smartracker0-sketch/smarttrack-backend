@@ -8,6 +8,7 @@ import com.trackpro.model.DeviceEntity;
 import com.trackpro.repository.DeviceRepository;
 import com.trackpro.repository.OrganisationRepository;
 import com.trackpro.repository.UserRepository;
+import com.trackpro.sms.DeviceActivationService;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,16 @@ public class AdminDeviceService {
     private final DeviceRepository deviceRepository;
     private final OrganisationRepository orgRepository;
     private final UserRepository userRepository;
+    private final DeviceActivationService activationService;
 
-    public AdminDeviceService(DeviceRepository deviceRepository, OrganisationRepository orgRepository, UserRepository userRepository) {
+    public AdminDeviceService(DeviceRepository deviceRepository,
+                              OrganisationRepository orgRepository,
+                              UserRepository userRepository,
+                              DeviceActivationService activationService) {
         this.deviceRepository = deviceRepository;
         this.orgRepository = orgRepository;
         this.userRepository = userRepository;
+        this.activationService = activationService;
     }
 
     public Page<AdminDeviceDto> list(Pageable pageable) {
@@ -61,6 +67,9 @@ public class AdminDeviceService {
             if (req.serialNo() != null) d.setSerialNo(req.serialNo());
             if (req.vehiclePlate() != null) d.setVehiclePlate(req.vehiclePlate());
             if (req.notes() != null) d.setNotes(req.notes());
+            if (req.simNumber() != null) d.setSimNumber(req.simNumber());
+            if (req.simApn() != null) d.setSimApn(req.simApn());
+            if (req.manufacturer() != null) d.setManufacturer(req.manufacturer());
             d.setOrganisation(org);
             d.setStatus(org != null ? "Assigned" : "Unassigned");
             result.add(toDto(deviceRepository.save(d)));
@@ -76,7 +85,9 @@ public class AdminDeviceService {
                 .orElseThrow(() -> new NotFoundException("Organisation not found"));
         d.setOrganisation(org);
         d.setStatus("Assigned");
-        return toDto(deviceRepository.save(d));
+        DeviceEntity saved = deviceRepository.save(d);
+        activationService.initiateCheck(saved);
+        return toDto(saved);
     }
 
     @Transactional
@@ -87,7 +98,9 @@ public class AdminDeviceService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
         d.setOwner(user);
         d.setStatus("Assigned");
-        return toDto(deviceRepository.save(d));
+        DeviceEntity saved = deviceRepository.save(d);
+        activationService.initiateCheck(saved);
+        return toDto(saved);
     }
 
     @Transactional
@@ -119,6 +132,15 @@ public class AdminDeviceService {
                 org != null ? org.getName() : null,
                 owner != null ? owner.getId() : null,
                 owner != null ? owner.getDisplayName() : null,
+                d.getSimNumber(),
+                d.getManufacturer(),
+                d.getActivationStatus(),
+                d.getActivationAttempts(),
+                d.getActivationAttemptedAt(),
+                d.getActivationConfirmedAt(),
+                d.getLastSmsReply(),
+                d.isServerConfigured(),
+                d.isApnConfigured(),
                 d.getCreatedAt()
         );
     }

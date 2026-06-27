@@ -12,5 +12,8 @@ public record AdminBulkDeviceRequest(
         String serialNo,
         UUID organisationId,
         String vehiclePlate,
-        String notes
+        String notes,
+        String simNumber,
+        String simApn,
+        String manufacturer
 ) {}
