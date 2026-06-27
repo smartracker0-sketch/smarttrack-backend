@@ -17,6 +17,10 @@ public interface DeviceAlertRepository extends JpaRepository<DeviceAlert, UUID> 
 
     List<DeviceAlert> findByDeviceIdAndAcknowledgedFalseOrderByAlertTimeDesc(UUID deviceId);
 
+    long countByAcknowledgedFalse();
+
+    Page<DeviceAlert> findAllByOrderByAlertTimeDesc(Pageable pageable);
+
     @Modifying
     @Query("update DeviceAlert a set a.acknowledged = true, a.ackAt = :now, a.ackBy = :user where a.id = :id")
     int acknowledge(@Param("id") UUID id, @Param("user") com.trackpro.model.UserEntity user, @Param("now") Instant now);

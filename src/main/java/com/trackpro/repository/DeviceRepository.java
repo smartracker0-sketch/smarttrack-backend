@@ -15,4 +15,5 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
     Optional<DeviceEntity> findByIdAndOwnerId(UUID id, UUID ownerId);
     Page<DeviceEntity> findByOrganisationId(UUID organisationId, Pageable pageable);
     List<DeviceEntity> findByStatusNot(String status);
+    long countByStatus(String status);
 }
