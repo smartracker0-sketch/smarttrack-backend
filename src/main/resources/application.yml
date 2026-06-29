@@ -65,11 +65,25 @@ trackpro:
       drainage-threshold-percent: 10
       drainage-window-minutes: 5
   sms:
-    provider: termii
+    provider: ${SMS_PROVIDER:termii}
     termii:
       api-key: ${TERMII_API_KEY:}
       sender-id: ${TERMII_SENDER_ID:N-Alert}
       base-url: ${TERMII_BASE_URL:https://api.ng.termii.com}
+      channel: generic
+      timeout-seconds: 10
+    africastalking:
+      api-key: ${AT_API_KEY:}
+      username: ${AT_USERNAME:}
+      sender-id: ${AT_SENDER_ID:STTracker}
+      base-url: https://api.africastalking.com
+      sandbox-mode: ${AT_SANDBOX:false}
+      timeout-seconds: 10
+    retry:
+      max-attempts: 3
+      backoff-seconds: 5
+    rate-limit:
+      max-per-minute: 60
     activation:
       command: STATUS
       timeout-minutes: 5

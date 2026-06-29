@@ -3,6 +3,8 @@ package com.trackpro.sms;
 import com.trackpro.exception.NotFoundException;
 import com.trackpro.repository.DeviceRepository;
 import com.trackpro.sms.dto.InboundSmsPayload;
+import com.trackpro.sms.webhook.AfricasTalkingWebhookParser;
+import com.trackpro.sms.webhook.TermiiWebhookParser;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,24 +28,55 @@ public class InboundSmsController {
     private final StringRedisTemplate redis;
     private final DeviceActivationService activationService;
     private final DeviceRepository deviceRepository;
+    private final TermiiWebhookParser termiiParser;
+    private final AfricasTalkingWebhookParser atParser;
 
     public InboundSmsController(StringRedisTemplate redis,
                                 DeviceActivationService activationService,
-                                DeviceRepository deviceRepository) {
+                                DeviceRepository deviceRepository,
+                                TermiiWebhookParser termiiParser,
+                                AfricasTalkingWebhookParser atParser) {
         this.redis = redis;
         this.activationService = activationService;
         this.deviceRepository = deviceRepository;
+        this.termiiParser = termiiParser;
+        this.atParser = atParser;
     }
 
     /**
-     * Termii webhook — called when a device SIM sends an inbound SMS reply.
-     * This endpoint is intentionally public (no JWT) because Termii posts to it.
+     * Termii inbound webhook — configure in Termii dashboard as:
+     * https://api.smarttracker.cloud/api/v1/sms/inbound/termii
+     */
+    @PostMapping("/inbound/termii")
+    public ResponseEntity<Void> termiiInbound(@RequestBody Map<String, Object> raw) {
+        InboundSmsPayload payload = termiiParser.parse(raw);
+        return routeInbound(payload);
+    }
+
+    /**
+     * Africa's Talking inbound webhook — configure in AT dashboard as:
+     * https://api.smarttracker.cloud/api/v1/sms/inbound/africastalking
+     * AT sends form params, not JSON body.
+     */
+    @PostMapping("/inbound/africastalking")
+    public ResponseEntity<Void> atInbound(@RequestParam Map<String, String> raw) {
+        InboundSmsPayload payload = atParser.parse(raw);
+        return routeInbound(payload);
+    }
+
+    /**
+     * Legacy Termii webhook path — kept for backward compat.
      */
     @PostMapping("/inbound")
-    public ResponseEntity<Void> receiveInbound(@RequestBody InboundSmsPayload payload) {
-        String from = payload.getFrom();
-        String text = payload.getText();
-        log.info("Inbound SMS from={} text={}", from, text);
+    public ResponseEntity<Void> legacyInbound(@RequestBody Map<String, Object> raw) {
+        InboundSmsPayload payload = termiiParser.parse(raw);
+        return routeInbound(payload);
+    }
+
+    private ResponseEntity<Void> routeInbound(InboundSmsPayload payload) {
+        String from = payload.from();
+        String text = payload.text();
+        log.info("Inbound SMS provider={} from={} text={}", payload.provider(), from, text);
 
         if (from == null || text == null) {
             return ResponseEntity.badRequest().build();
@@ -60,7 +94,6 @@ public class InboundSmsController {
 
     /**
      * Admin manually triggers an activation check for a device by IMEI.
-     * POST /api/v1/sms/devices/{imei}/check
      */
     @PostMapping("/devices/{imei}/check")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN', 'ROLE_ADMIN')")

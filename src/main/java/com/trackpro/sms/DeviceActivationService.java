@@ -21,20 +21,20 @@ public class DeviceActivationService {
     private static final Logger log = LoggerFactory.getLogger(DeviceActivationService.class);
     private static final String REDIS_PREFIX = "device:activation:pending:";
 
-    private final SmsProvider smsProvider;
+    private final SmsService smsService;
     private final DeviceRepository deviceRepository;
     private final StringRedisTemplate redis;
     private final SimpMessagingTemplate ws;
     private final InboundSmsParser parser;
     private final SmsProperties props;
 
-    public DeviceActivationService(SmsProvider smsProvider,
+    public DeviceActivationService(SmsService smsService,
                                    DeviceRepository deviceRepository,
                                    StringRedisTemplate redis,
                                    SimpMessagingTemplate ws,
                                    InboundSmsParser parser,
                                    SmsProperties props) {
-        this.smsProvider = smsProvider;
+        this.smsService = smsService;
         this.deviceRepository = deviceRepository;
         this.redis = redis;
         this.ws = ws;
@@ -55,20 +55,20 @@ public class DeviceActivationService {
             int tcpPort = props.getServer().getTcpPort();
             if (!serverHost.isBlank()) {
                 String serverCmd = String.format("SERVER,1,%s,%d,0", serverHost, tcpPort);
-                smsProvider.send(device.getSimNumber(), serverCmd);
+                smsService.send(device.getSimNumber(), serverCmd);
                 Thread.sleep(5_000);
                 device.setServerConfigured(true);
             }
 
             // Step 2: Send APN command if configured
             if (device.getSimApn() != null && !device.getSimApn().isBlank()) {
-                smsProvider.send(device.getSimNumber(), "APN," + device.getSimApn());
+                smsService.send(device.getSimNumber(), "APN," + device.getSimApn());
                 Thread.sleep(5_000);
                 device.setApnConfigured(true);
             }
 
             // Step 3: Send STATUS query
-            smsProvider.send(device.getSimNumber(), props.getActivation().getCommand());
+            smsService.send(device.getSimNumber(), props.getActivation().getCommand());
 
             // Step 4: Update DB — PENDING state
             device.setActivationStatus(DeviceActivationStatus.PENDING.name());
