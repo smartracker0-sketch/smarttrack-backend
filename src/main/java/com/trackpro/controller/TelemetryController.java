@@ -94,16 +94,30 @@ public class TelemetryController {
 
     @GetMapping("/alerts")
     public List<DeviceAlertDto> alerts(
-            @RequestParam UUID deviceId,
+            @RequestParam(required = false) UUID deviceId,
             @RequestParam(defaultValue = "false") boolean unacknowledgedOnly
     ) {
-        assertOwnsDevice(deviceId);
-        if (unacknowledgedOnly) {
-            return alertRepository.findByDeviceIdAndAcknowledgedFalseOrderByAlertTimeDesc(deviceId)
+        if (deviceId != null) {
+            assertOwnsDevice(deviceId);
+            if (unacknowledgedOnly) {
+                return alertRepository.findByDeviceIdAndAcknowledgedFalseOrderByAlertTimeDesc(deviceId)
+                        .stream().map(TelemetryService::toAlertDto).toList();
+            }
+            return alertRepository.findByDeviceIdOrderByAlertTimeDesc(deviceId, Pageable.unpaged())
                     .stream().map(TelemetryService::toAlertDto).toList();
         }
-        return alertRepository.findByDeviceIdOrderByAlertTimeDesc(deviceId, Pageable.unpaged())
-                .stream().map(TelemetryService::toAlertDto).toList();
+        // No deviceId — return alerts for all of this user's devices
+        UUID userId = CurrentUser.userId();
+        if (userId == null) throw new com.trackpro.exception.UnauthorizedException("Authentication required");
+        var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
+        List<DeviceAlertDto> all = orgId != null
+                ? alertRepository.findByDeviceOwnerOrOrgOrderByAlertTimeDesc(userId, orgId, Pageable.ofSize(200))
+                        .stream().map(TelemetryService::toAlertDto).toList()
+                : alertRepository.findByDeviceOwnerIdOrderByAlertTimeDesc(userId, Pageable.ofSize(200))
+                        .stream().map(TelemetryService::toAlertDto).toList();
+        if (unacknowledgedOnly) return all.stream().filter(a -> !a.acknowledged()).toList();
+        return all;
     }
 
     @PatchMapping("/alerts/{alertId}/acknowledge")

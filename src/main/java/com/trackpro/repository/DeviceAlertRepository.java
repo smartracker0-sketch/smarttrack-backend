@@ -17,6 +17,12 @@ public interface DeviceAlertRepository extends JpaRepository<DeviceAlert, UUID> 
 
     List<DeviceAlert> findByDeviceIdAndAcknowledgedFalseOrderByAlertTimeDesc(UUID deviceId);
 
+    @Query("SELECT a FROM DeviceAlert a WHERE a.device.owner.id = :userId ORDER BY a.alertTime DESC")
+    List<DeviceAlert> findByDeviceOwnerIdOrderByAlertTimeDesc(@Param("userId") UUID userId, Pageable pageable);
+
+    @Query("SELECT a FROM DeviceAlert a WHERE a.device.owner.id = :userId OR a.device.organisation.id = :orgId ORDER BY a.alertTime DESC")
+    List<DeviceAlert> findByDeviceOwnerOrOrgOrderByAlertTimeDesc(@Param("userId") UUID userId, @Param("orgId") UUID orgId, Pageable pageable);
+
     long countByAcknowledgedFalse();
 
     Page<DeviceAlert> findAllByOrderByAlertTimeDesc(Pageable pageable);
