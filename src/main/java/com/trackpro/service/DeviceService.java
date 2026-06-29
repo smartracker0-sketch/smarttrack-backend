@@ -27,6 +27,7 @@ public class DeviceService {
 
     public Page<DeviceDto> listMine(Pageable pageable) {
         var userId = CurrentUser.userId();
+        if (userId == null) throw new com.trackpro.exception.UnauthorizedException("Authentication required");
         var user = userRepository.findById(userId).orElseThrow(() -> new com.trackpro.exception.NotFoundException("User not found"));
         var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
         if (orgId != null) {
@@ -52,6 +53,7 @@ public class DeviceService {
 
     public DeviceDto getMine(UUID id) {
         var userId = CurrentUser.userId();
+        if (userId == null) throw new com.trackpro.exception.UnauthorizedException("Authentication required");
         var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
         var device = orgId != null

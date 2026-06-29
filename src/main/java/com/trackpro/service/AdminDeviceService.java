@@ -78,8 +78,8 @@ public class AdminDeviceService {
             boolean assigned = org != null || user != null;
             d.setStatus(assigned ? "Assigned" : "Unassigned");
             DeviceEntity saved = deviceRepository.save(d);
-            if (assigned) activationService.initiateCheck(saved);
             result.add(toDto(saved));
+            if (assigned) activationService.initiateCheck(saved);
         }
         return result;
     }
@@ -93,8 +93,9 @@ public class AdminDeviceService {
         d.setOrganisation(org);
         d.setStatus("Assigned");
         DeviceEntity saved = deviceRepository.save(d);
+        AdminDeviceDto dto = toDto(saved);
         activationService.initiateCheck(saved);
-        return toDto(saved);
+        return dto;
     }
 
     @Transactional
@@ -106,8 +107,9 @@ public class AdminDeviceService {
         d.setOwner(user);
         d.setStatus("Assigned");
         DeviceEntity saved = deviceRepository.save(d);
+        AdminDeviceDto dto = toDto(saved);
         activationService.initiateCheck(saved);
-        return toDto(saved);
+        return dto;
     }
 
     @Transactional
