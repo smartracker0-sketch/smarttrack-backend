@@ -139,9 +139,8 @@ public class TelemetryController {
         if (userId == null) throw new com.trackpro.exception.UnauthorizedException("Authentication required");
         var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
-        boolean hasAccess = orgId != null
-                ? deviceRepository.findByIdAndOwnerIdOrIdAndOrganisationId(deviceId, userId, deviceId, orgId).isPresent()
-                : deviceRepository.findByIdAndOwnerId(deviceId, userId).isPresent();
+        UUID effectiveOrgId = orgId != null ? orgId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        boolean hasAccess = deviceRepository.findByIdAndOwnerOrOrganisation(deviceId, userId, effectiveOrgId).isPresent();
         if (!hasAccess) throw new NotFoundException("Device not found");
     }
 

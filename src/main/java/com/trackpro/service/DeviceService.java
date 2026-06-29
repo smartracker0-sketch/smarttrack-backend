@@ -56,11 +56,9 @@ public class DeviceService {
         if (userId == null) throw new com.trackpro.exception.UnauthorizedException("Authentication required");
         var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
-        var device = orgId != null
-                ? deviceRepository.findByIdAndOwnerIdOrIdAndOrganisationId(id, userId, id, orgId)
-                        .orElseThrow(() -> new NotFoundException("Device not found"))
-                : deviceRepository.findByIdAndOwnerId(id, userId)
-                        .orElseThrow(() -> new NotFoundException("Device not found"));
+        UUID effectiveOrgId = orgId != null ? orgId : java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
+        var device = deviceRepository.findByIdAndOwnerOrOrganisation(id, userId, effectiveOrgId)
+                .orElseThrow(() -> new NotFoundException("Device not found"));
         return toDto(device);
     }
 
