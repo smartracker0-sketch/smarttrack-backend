@@ -15,9 +15,10 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
     boolean existsByImei(String imei);
     Optional<DeviceEntity> findByImei(String imei);
     Page<DeviceEntity> findByOwnerId(UUID ownerId, Pageable pageable);
-    Page<DeviceEntity> findByOwnerIdOrOrganisationId(UUID ownerId, UUID organisationId, Pageable pageable);
+    @Query("SELECT d FROM DeviceEntity d LEFT JOIN d.owner o LEFT JOIN d.organisation org WHERE o.id = :ownerId OR org.id = :orgId")
+    Page<DeviceEntity> findByOwnerIdOrOrganisationId(@Param("ownerId") UUID ownerId, @Param("orgId") UUID orgId, Pageable pageable);
     Optional<DeviceEntity> findByIdAndOwnerId(UUID id, UUID ownerId);
-    @Query("SELECT d FROM DeviceEntity d WHERE d.id = :id AND (d.owner.id = :userId OR d.organisation.id = :orgId)")
+    @Query("SELECT d FROM DeviceEntity d LEFT JOIN d.owner o LEFT JOIN d.organisation org WHERE d.id = :id AND (o.id = :userId OR org.id = :orgId)")
     Optional<DeviceEntity> findByIdAndOwnerOrOrganisation(@Param("id") UUID id, @Param("userId") UUID userId, @Param("orgId") UUID orgId);
     Page<DeviceEntity> findByOrganisationId(UUID organisationId, Pageable pageable);
     List<DeviceEntity> findByStatusNot(String status);
