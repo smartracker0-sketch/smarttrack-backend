@@ -27,6 +27,11 @@ public class DeviceService {
 
     public Page<DeviceDto> listMine(Pageable pageable) {
         var userId = CurrentUser.userId();
+        var user = userRepository.findById(userId).orElseThrow(() -> new com.trackpro.exception.NotFoundException("User not found"));
+        var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
+        if (orgId != null) {
+            return deviceRepository.findByOwnerIdOrOrganisationId(userId, orgId, pageable).map(DeviceService::toDto);
+        }
         return deviceRepository.findByOwnerId(userId, pageable).map(DeviceService::toDto);
     }
 
@@ -47,7 +52,13 @@ public class DeviceService {
 
     public DeviceDto getMine(UUID id) {
         var userId = CurrentUser.userId();
-        var device = deviceRepository.findByIdAndOwnerId(id, userId).orElseThrow(() -> new NotFoundException("Device not found"));
+        var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
+        var device = orgId != null
+                ? deviceRepository.findByIdAndOwnerIdOrIdAndOrganisationId(id, userId, id, orgId)
+                        .orElseThrow(() -> new NotFoundException("Device not found"))
+                : deviceRepository.findByIdAndOwnerId(id, userId)
+                        .orElseThrow(() -> new NotFoundException("Device not found"));
         return toDto(device);
     }
 
@@ -67,10 +78,15 @@ public class DeviceService {
     }
 
     static DeviceDto toDto(DeviceEntity e) {
+        var org = e.getOrganisation();
+        var owner = e.getOwner();
         return new DeviceDto(
                 e.getId(), e.getImei(), e.getName(),
                 e.getDeviceType(), e.getFirmware(), e.getVehiclePlate(),
-                e.getStatus(), e.getCreatedAt()
+                e.getStatus(), e.getCreatedAt(),
+                org != null ? org.getId() : null,
+                org != null ? org.getName() : null,
+                owner != null ? owner.getDisplayName() : null
         );
     }
 }

@@ -13,7 +13,9 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, UUID> {
     boolean existsByImei(String imei);
     Optional<DeviceEntity> findByImei(String imei);
     Page<DeviceEntity> findByOwnerId(UUID ownerId, Pageable pageable);
+    Page<DeviceEntity> findByOwnerIdOrOrganisationId(UUID ownerId, UUID organisationId, Pageable pageable);
     Optional<DeviceEntity> findByIdAndOwnerId(UUID id, UUID ownerId);
+    Optional<DeviceEntity> findByIdAndOwnerIdOrIdAndOrganisationId(UUID id1, UUID ownerId, UUID id2, UUID organisationId);
     Page<DeviceEntity> findByOrganisationId(UUID organisationId, Pageable pageable);
     List<DeviceEntity> findByStatusNot(String status);
     long countByStatus(String status);

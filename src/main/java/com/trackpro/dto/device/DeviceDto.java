@@ -11,6 +11,9 @@ public record DeviceDto(
         String firmware,
         String vehiclePlate,
         String status,
-        Instant createdAt
+        Instant createdAt,
+        UUID organisationId,
+        String organisationName,
+        String ownerName
 ) {
 }
