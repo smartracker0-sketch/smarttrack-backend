@@ -120,8 +120,13 @@ public class TelemetryController {
 
     private void assertOwnsDevice(UUID deviceId) {
         UUID userId = CurrentUser.userId();
-        deviceRepository.findByIdAndOwnerId(deviceId, userId)
-                .orElseThrow(() -> new NotFoundException("Device not found"));
+        if (userId == null) throw new com.trackpro.exception.UnauthorizedException("Authentication required");
+        var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        var orgId = user.getOrganisation() != null ? user.getOrganisation().getId() : null;
+        boolean hasAccess = orgId != null
+                ? deviceRepository.findByIdAndOwnerIdOrIdAndOrganisationId(deviceId, userId, deviceId, orgId).isPresent()
+                : deviceRepository.findByIdAndOwnerId(deviceId, userId).isPresent();
+        if (!hasAccess) throw new NotFoundException("Device not found");
     }
 
     private static FuelReadingDto toFuelDto(FuelReading f) {
