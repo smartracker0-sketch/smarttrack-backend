@@ -70,6 +70,12 @@ public class AdminDeviceController {
         return service.unassign(id);
     }
 
+    @PostMapping("/{imei}/check")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void checkActivation(@PathVariable String imei) {
+        service.checkActivation(imei);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {

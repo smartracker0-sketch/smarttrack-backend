@@ -43,6 +43,12 @@ public class AdminDeviceService {
         return toDto(deviceRepository.findById(id).orElseThrow(() -> new NotFoundException("Device not found")));
     }
 
+    public void checkActivation(String imei) {
+        DeviceEntity d = deviceRepository.findByImei(imei)
+                .orElseThrow(() -> new NotFoundException("Device not found: " + imei));
+        activationService.initiateCheck(d);
+    }
+
     @Transactional
     public List<AdminDeviceDto> bulkAdd(AdminBulkDeviceRequest req) {
         var org = req.organisationId() != null
