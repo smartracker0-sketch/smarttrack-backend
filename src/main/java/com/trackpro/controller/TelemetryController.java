@@ -4,6 +4,7 @@ import com.trackpro.dto.telemetry.DeviceAlertDto;
 import com.trackpro.dto.telemetry.FuelReadingDto;
 import com.trackpro.dto.telemetry.TelemetryEventDto;
 import com.trackpro.exception.NotFoundException;
+import org.springframework.http.ResponseEntity;
 import com.trackpro.model.DeviceAlert;
 import com.trackpro.model.FuelReading;
 import com.trackpro.repository.DeviceAlertRepository;
@@ -54,11 +55,12 @@ public class TelemetryController {
     }
 
     @GetMapping("/latest")
-    public TelemetryEventDto latest(@RequestParam UUID deviceId) {
+    public ResponseEntity<TelemetryEventDto> latest(@RequestParam UUID deviceId) {
         assertOwnsDevice(deviceId);
         return telemetryRepository.findTopByDeviceIdOrderByEventTimeDesc(deviceId)
                 .map(TelemetryService::toDto)
-                .orElseThrow(() -> new NotFoundException("No telemetry for device"));
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/history")
