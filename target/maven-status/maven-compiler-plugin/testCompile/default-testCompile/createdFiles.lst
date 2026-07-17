@@ -1,9 +1,13 @@
 com/trackpro/alert/rules/IdleTimeRuleTest.class
+com/trackpro/sms/SmsWebhookVerifierTest.class
 com/trackpro/scorecard/ScoreCalculatorTest.class
-com/trackpro/DeviceApiIntegrationTest.class
-com/trackpro/scorecard/RollingScoreCalculatorTest.class
+com/trackpro/sms/DeviceCommandBuilderTest.class
 com/trackpro/alert/rules/OverspeedRuleTest.class
 com/trackpro/AuthFlowIntegrationTest.class
 com/trackpro/alert/rules/GeofenceRuleTest.class
+com/trackpro/DeviceApiIntegrationTest.class
+com/trackpro/sms/SmsServiceTest$NoopSmsAuditService.class
+com/trackpro/scorecard/RollingScoreCalculatorTest.class
+com/trackpro/sms/SmsServiceTest$FakeSmsProvider.class
 com/trackpro/scorecard/DriverScoreServiceTest.class
 com/trackpro/alert/rules/HarshDrivingRuleTest.class
