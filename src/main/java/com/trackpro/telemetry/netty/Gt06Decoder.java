@@ -82,17 +82,25 @@ public class Gt06Decoder extends ByteToMessageDecoder {
 
     private void handleLogin(ChannelHandlerContext ctx, byte[] data, int serialNo) {
         if (data.length < 8) return;
-        StringBuilder imei = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
-            int b = data[i] & 0xFF;
-            if (i == 0) imei.append(b >> 4);
-            imei.append(b & 0x0F);
-        }
-        String imeiStr = imei.toString();
-        if (imeiStr.length() > 15) imeiStr = imeiStr.substring(0, 15);
+        String imeiStr = decodeImei(data);
+        if (imeiStr == null) return;
         ctx.channel().attr(IMEI_KEY).set(imeiStr);
         log.info("GT06 device login IMEI={}", imeiStr);
         sendResponse(ctx, (byte) 0x01, serialNo);
+    }
+
+    static String decodeImei(byte[] data) {
+        if (data == null || data.length < 8) return null;
+        StringBuilder digits = new StringBuilder(16);
+        for (int i = 0; i < 8; i++) {
+            int value = data[i] & 0xFF;
+            int high = value >>> 4;
+            int low = value & 0x0F;
+            if (high > 9 || low > 9) return null;
+            digits.append(high).append(low);
+        }
+        if (digits.charAt(0) == '0') digits.deleteCharAt(0);
+        return digits.length() >= 15 ? digits.substring(0, 15) : null;
     }
 
     private void handleGps(ChannelHandlerContext ctx, byte[] data, List<Object> out) {
