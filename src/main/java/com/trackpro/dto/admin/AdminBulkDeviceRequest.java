@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record AdminBulkDeviceRequest(
         @NotEmpty List<String> imeis,
+        String name,
         String deviceType,
         String firmware,
         String simCard,
@@ -16,5 +17,9 @@ public record AdminBulkDeviceRequest(
         String notes,
         String simNumber,
         String simApn,
-        String manufacturer
+        String manufacturer,
+        String model,
+        String simIccid,
+        String mobileCarrier,
+        String smsCommandPassword
 ) {}

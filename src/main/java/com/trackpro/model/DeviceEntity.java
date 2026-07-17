@@ -65,6 +65,18 @@ public class DeviceEntity {
     @Column(length = 64)
     private String manufacturer;
 
+    @Column(length = 64)
+    private String model;
+
+    @Column(length = 32)
+    private String simIccid;
+
+    @Column(length = 64)
+    private String mobileCarrier;
+
+    @Column(columnDefinition = "TEXT")
+    private String smsCommandPasswordEncrypted;
+
     @Column(nullable = false, length = 30)
     private String activationStatus = "UNACTIVATED";
 
@@ -135,6 +147,18 @@ public class DeviceEntity {
 
     public String getManufacturer() { return manufacturer; }
     public void setManufacturer(String manufacturer) { this.manufacturer = manufacturer; }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public String getSimIccid() { return simIccid; }
+    public void setSimIccid(String simIccid) { this.simIccid = simIccid; }
+
+    public String getMobileCarrier() { return mobileCarrier; }
+    public void setMobileCarrier(String mobileCarrier) { this.mobileCarrier = mobileCarrier; }
+
+    public String getSmsCommandPasswordEncrypted() { return smsCommandPasswordEncrypted; }
+    public void setSmsCommandPasswordEncrypted(String smsCommandPasswordEncrypted) { this.smsCommandPasswordEncrypted = smsCommandPasswordEncrypted; }
 
     public String getActivationStatus() { return activationStatus; }
     public void setActivationStatus(String activationStatus) { this.activationStatus = activationStatus; }

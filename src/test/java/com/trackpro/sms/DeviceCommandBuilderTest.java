@@ -14,7 +14,7 @@ class DeviceCommandBuilderTest {
         SmsProperties props = new SmsProperties();
         props.getServer().setHost("api.smarttracker.cloud");
         props.getServer().setTcpPort(5023);
-        DeviceCommandBuilder builder = new DeviceCommandBuilder(props);
+        DeviceCommandBuilder builder = new DeviceCommandBuilder(props, new com.trackpro.security.DeviceCommandPasswordCipher(""));
 
         DeviceEntity device = new DeviceEntity();
         device.setImei("123456789012345");
@@ -40,7 +40,7 @@ class DeviceCommandBuilderTest {
         concox.setStatusCommand("CONCOXSTATUS");
         props.setCommandProfiles(Map.of("generic", new SmsProperties.CommandProfile(), "concox", concox));
 
-        DeviceCommandBuilder builder = new DeviceCommandBuilder(props);
+        DeviceCommandBuilder builder = new DeviceCommandBuilder(props, new com.trackpro.security.DeviceCommandPasswordCipher(""));
         DeviceEntity device = new DeviceEntity();
         device.setImei("123456789012345");
         device.setManufacturer("Concox");

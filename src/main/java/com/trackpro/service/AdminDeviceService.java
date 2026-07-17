@@ -9,6 +9,7 @@ import com.trackpro.model.DeviceEntity;
 import com.trackpro.repository.DeviceRepository;
 import com.trackpro.repository.OrganisationRepository;
 import com.trackpro.repository.UserRepository;
+import com.trackpro.security.DeviceCommandPasswordCipher;
 import com.trackpro.sms.DeviceActivationService;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -25,15 +26,18 @@ public class AdminDeviceService {
     private final OrganisationRepository orgRepository;
     private final UserRepository userRepository;
     private final DeviceActivationService activationService;
+    private final DeviceCommandPasswordCipher commandPasswordCipher;
 
     public AdminDeviceService(DeviceRepository deviceRepository,
                               OrganisationRepository orgRepository,
                               UserRepository userRepository,
-                              DeviceActivationService activationService) {
+                              DeviceActivationService activationService,
+                              DeviceCommandPasswordCipher commandPasswordCipher) {
         this.deviceRepository = deviceRepository;
         this.orgRepository = orgRepository;
         this.userRepository = userRepository;
         this.activationService = activationService;
+        this.commandPasswordCipher = commandPasswordCipher;
     }
 
     public Page<AdminDeviceDto> list(Pageable pageable) {
@@ -70,7 +74,7 @@ public class AdminDeviceService {
             }
             DeviceEntity d = new DeviceEntity();
             d.setImei(imei);
-            d.setName(imei);
+            d.setName(req.name() == null || req.name().isBlank() ? imei : req.name().trim());
             if (req.deviceType() != null) d.setDeviceType(req.deviceType());
             if (req.firmware() != null) d.setFirmware(req.firmware());
             if (req.simCard() != null) d.setSimCard(req.simCard());
@@ -80,6 +84,10 @@ public class AdminDeviceService {
             if (req.simNumber() != null) d.setSimNumber(req.simNumber());
             if (req.simApn() != null) d.setSimApn(req.simApn());
             if (req.manufacturer() != null) d.setManufacturer(req.manufacturer());
+            if (req.model() != null) d.setModel(req.model());
+            if (req.simIccid() != null) d.setSimIccid(req.simIccid());
+            if (req.mobileCarrier() != null) d.setMobileCarrier(req.mobileCarrier());
+            updateCommandPassword(d, req.smsCommandPassword());
             d.setOrganisation(org);
             d.setOwner(user);
             boolean assigned = org != null || user != null;
@@ -106,6 +114,10 @@ public class AdminDeviceService {
         if (req.simNumber() != null) d.setSimNumber(req.simNumber().trim());
         if (req.simApn() != null) d.setSimApn(req.simApn().trim());
         if (req.manufacturer() != null) d.setManufacturer(req.manufacturer().trim());
+        if (req.model() != null) d.setModel(req.model().trim());
+        if (req.simIccid() != null) d.setSimIccid(req.simIccid().trim());
+        if (req.mobileCarrier() != null) d.setMobileCarrier(req.mobileCarrier().trim());
+        updateCommandPassword(d, req.smsCommandPassword());
 
         return toDto(deviceRepository.save(d));
     }
@@ -156,6 +168,11 @@ public class AdminDeviceService {
         deviceRepository.delete(d);
     }
 
+    private void updateCommandPassword(DeviceEntity device, String password) {
+        if (password == null) return;
+        device.setSmsCommandPasswordEncrypted(password.isBlank() ? null : commandPasswordCipher.encrypt(password));
+    }
+
     static AdminDeviceDto toDto(DeviceEntity d) {
         var org = d.getOrganisation();
         var owner = d.getOwner();
@@ -170,6 +187,10 @@ public class AdminDeviceService {
                 d.getSimNumber(),
                 d.getSimApn(),
                 d.getManufacturer(),
+                d.getModel(),
+                d.getSimIccid(),
+                d.getMobileCarrier(),
+                d.getSmsCommandPasswordEncrypted() != null && !d.getSmsCommandPasswordEncrypted().isBlank(),
                 d.getActivationStatus(),
                 d.getActivationAttempts(),
                 d.getActivationAttemptedAt(),

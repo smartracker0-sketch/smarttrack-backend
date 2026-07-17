@@ -10,5 +10,9 @@ public record AdminDeviceUpdateRequest(
         String notes,
         String simNumber,
         String simApn,
-        String manufacturer
+        String manufacturer,
+        String model,
+        String simIccid,
+        String mobileCarrier,
+        String smsCommandPassword
 ) {}
