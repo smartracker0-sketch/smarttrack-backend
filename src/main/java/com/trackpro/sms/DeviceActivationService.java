@@ -27,19 +27,25 @@ public class DeviceActivationService {
     private final SimpMessagingTemplate ws;
     private final InboundSmsParser parser;
     private final SmsProperties props;
+    private final SmsPhoneNumberNormalizer phoneNumberNormalizer;
+    private final DeviceCommandBuilder commandBuilder;
 
     public DeviceActivationService(SmsService smsService,
                                    DeviceRepository deviceRepository,
                                    StringRedisTemplate redis,
                                    SimpMessagingTemplate ws,
                                    InboundSmsParser parser,
-                                   SmsProperties props) {
+                                   SmsProperties props,
+                                   SmsPhoneNumberNormalizer phoneNumberNormalizer,
+                                   DeviceCommandBuilder commandBuilder) {
         this.smsService = smsService;
         this.deviceRepository = deviceRepository;
         this.redis = redis;
         this.ws = ws;
         this.parser = parser;
         this.props = props;
+        this.phoneNumberNormalizer = phoneNumberNormalizer;
+        this.commandBuilder = commandBuilder;
     }
 
     @Async("smsExecutor")
@@ -50,34 +56,25 @@ public class DeviceActivationService {
         }
 
         try {
-            // Step 1: Send SERVER configuration command to point device at our TCP server
-            String serverHost = props.getServer().getHost();
-            int tcpPort = props.getServer().getTcpPort();
-            if (!serverHost.isBlank()) {
-                String serverCmd = String.format("SERVER,1,%s,%d,0", serverHost, tcpPort);
-                smsService.send(device.getSimNumber(), serverCmd);
+            for (String command : commandBuilder.buildActivationCommands(device)) {
+                smsService.send(device.getSimNumber(), command, device.getImei());
                 Thread.sleep(5_000);
-                device.setServerConfigured(true);
             }
 
-            // Step 2: Send APN command if configured
+            if (props.getServer().getHost() != null && !props.getServer().getHost().isBlank()) {
+                device.setServerConfigured(true);
+            }
             if (device.getSimApn() != null && !device.getSimApn().isBlank()) {
-                smsService.send(device.getSimNumber(), "APN," + device.getSimApn());
-                Thread.sleep(5_000);
                 device.setApnConfigured(true);
             }
 
-            // Step 3: Send STATUS query
-            smsService.send(device.getSimNumber(), props.getActivation().getCommand());
-
-            // Step 4: Update DB — PENDING state
             device.setActivationStatus(DeviceActivationStatus.PENDING.name());
             device.setActivationAttemptedAt(Instant.now());
             deviceRepository.save(device);
 
-            // Step 5: Cache SIM → IMEI mapping in Redis for the inbound webhook to look up
+            String normalisedSim = phoneNumberNormalizer.normalise(device.getSimNumber());
             redis.opsForValue().set(
-                    REDIS_PREFIX + device.getSimNumber(),
+                    REDIS_PREFIX + normalisedSim,
                     device.getImei(),
                     Duration.ofMinutes(props.getActivation().getTimeoutMinutes())
             );
@@ -122,7 +119,7 @@ public class DeviceActivationService {
 
         // Clear Redis pending key
         if (device.getSimNumber() != null) {
-            redis.delete(REDIS_PREFIX + device.getSimNumber());
+            redis.delete(REDIS_PREFIX + phoneNumberNormalizer.normalise(device.getSimNumber()));
         }
     }
 

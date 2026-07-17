@@ -1,32 +1,29 @@
 package com.trackpro.sms;
 
 import com.trackpro.config.SmsProperties;
+import com.trackpro.repository.SmsAuditLogRepository;
 import com.trackpro.sms.dto.OutboundSmsResult;
 import com.trackpro.sms.dto.SmsDeliveryStatus;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 class SmsServiceTest {
 
-    private SmsProvider termiiProvider;
-    private SmsProvider atProvider;
+    private FakeSmsProvider termiiProvider;
+    private FakeSmsProvider atProvider;
     private SmsProperties props;
+    private SmsService service;
 
     @BeforeEach
     void setUp() {
-        termiiProvider = mock(SmsProvider.class);
-        when(termiiProvider.getProviderName()).thenReturn("termii");
-
-        atProvider = mock(SmsProvider.class);
-        when(atProvider.getProviderName()).thenReturn("africastalking");
-
+        termiiProvider = new FakeSmsProvider("termii");
+        atProvider = new FakeSmsProvider("africastalking");
         props = new SmsProperties();
         props.getRetry().setMaxAttempts(3);
         props.getRetry().setBackoffSeconds(0);
@@ -35,21 +32,21 @@ class SmsServiceTest {
     @Test
     void selectsTermiiProviderByConfig() {
         props.setProvider("termii");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         assertThat(service.getActiveProviderName()).isEqualTo("termii");
     }
 
     @Test
     void selectsAfricasTalkingProviderByConfig() {
         props.setProvider("africastalking");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         assertThat(service.getActiveProviderName()).isEqualTo("africastalking");
     }
 
     @Test
     void throwsOnUnknownProvider() {
         props.setProvider("unknown");
-        assertThatThrownBy(() -> new SmsService(List.of(termiiProvider, atProvider), props))
+        assertThatThrownBy(this::service)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("unknown");
     }
@@ -57,9 +54,7 @@ class SmsServiceTest {
     @Test
     void switchProviderAtRuntime() {
         props.setProvider("termii");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
-        assertThat(service.getActiveProviderName()).isEqualTo("termii");
-
+        service = service();
         service.switchProvider("africastalking");
         assertThat(service.getActiveProviderName()).isEqualTo("africastalking");
     }
@@ -67,55 +62,106 @@ class SmsServiceTest {
     @Test
     void retriesOnFailureThenReturnsFailed() {
         props.setProvider("termii");
-        when(termiiProvider.send(anyString(), anyString()))
-                .thenReturn(OutboundSmsResult.failed("+2348012345678", "termii"));
+        termiiProvider.nextResults = List.of(
+                OutboundSmsResult.failed("+2348012345678", "termii"),
+                OutboundSmsResult.failed("+2348012345678", "termii"),
+                OutboundSmsResult.failed("+2348012345678", "termii")
+        );
 
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         OutboundSmsResult result = service.send("+2348012345678", "TEST");
 
-        verify(termiiProvider, times(3)).send(anyString(), anyString());
+        assertThat(termiiProvider.sendCount).isEqualTo(3);
         assertThat(result.status()).isEqualTo(SmsDeliveryStatus.FAILED);
     }
 
     @Test
     void stopsRetryingOnSuccess() {
         props.setProvider("termii");
-        OutboundSmsResult success = new OutboundSmsResult("msg-1", "+2348012345678",
-                SmsDeliveryStatus.SENT, "termii", "{}", Instant.now());
-        when(termiiProvider.send(anyString(), anyString())).thenReturn(success);
+        termiiProvider.nextResults = List.of(new OutboundSmsResult("msg-1", "+2348012345678",
+                SmsDeliveryStatus.SENT, "termii", "{}", Instant.now()));
 
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         OutboundSmsResult result = service.send("+2348012345678", "TEST");
 
-        verify(termiiProvider, times(1)).send(anyString(), anyString());
+        assertThat(termiiProvider.sendCount).isEqualTo(1);
         assertThat(result.status()).isEqualTo(SmsDeliveryStatus.SENT);
     }
 
     @Test
     void normalisesNigerianLocalFormat() {
         props.setProvider("termii");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         assertThat(service.normalisePhoneNumber("08012345678")).isEqualTo("+2348012345678");
     }
 
     @Test
     void normalisesNigerianWithoutPlus() {
         props.setProvider("termii");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         assertThat(service.normalisePhoneNumber("2348012345678")).isEqualTo("+2348012345678");
     }
 
     @Test
     void leavesInternationalFormatUnchanged() {
         props.setProvider("termii");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         assertThat(service.normalisePhoneNumber("+2348012345678")).isEqualTo("+2348012345678");
     }
 
     @Test
     void normalisesWithSpacesAndDashes() {
         props.setProvider("termii");
-        SmsService service = new SmsService(List.of(termiiProvider, atProvider), props);
+        service = service();
         assertThat(service.normalisePhoneNumber("080-1234-5678")).isEqualTo("+2348012345678");
+    }
+
+    private SmsService service() {
+        return new SmsService(
+                List.of(termiiProvider, atProvider),
+                props,
+                new NoopSmsAuditService(),
+                new SmsPhoneNumberNormalizer()
+        );
+    }
+
+    private static class FakeSmsProvider implements SmsProvider {
+        private final String name;
+        private List<OutboundSmsResult> nextResults = new ArrayList<>();
+        private int sendCount = 0;
+
+        private FakeSmsProvider(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getProviderName() {
+            return name;
+        }
+
+        @Override
+        public OutboundSmsResult send(String to, String message) {
+            sendCount++;
+            if (!nextResults.isEmpty()) {
+                int index = Math.min(sendCount - 1, nextResults.size() - 1);
+                return nextResults.get(index);
+            }
+            return new OutboundSmsResult("msg-" + sendCount, to, SmsDeliveryStatus.SENT, name, "{}", Instant.now());
+        }
+
+        @Override
+        public OutboundSmsResult checkStatus(String messageId) {
+            return new OutboundSmsResult(messageId, null, SmsDeliveryStatus.DELIVERED, name, "{}", Instant.now());
+        }
+    }
+
+    private static class NoopSmsAuditService extends SmsAuditService {
+        private NoopSmsAuditService() {
+            super((SmsAuditLogRepository) null);
+        }
+
+        @Override
+        public void recordOutbound(OutboundSmsResult result, String messageBody, String relatedImei) {
+        }
     }
 }

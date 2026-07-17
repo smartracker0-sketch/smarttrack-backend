@@ -17,23 +17,37 @@ public class SmsService {
     private final AtomicReference<SmsProvider> activeProvider;
     private final List<SmsProvider> providers;
     private final SmsProperties config;
+    private final SmsAuditService auditService;
+    private final SmsPhoneNumberNormalizer phoneNumberNormalizer;
 
-    public SmsService(List<SmsProvider> providers, SmsProperties config) {
+    public SmsService(List<SmsProvider> providers,
+                      SmsProperties config,
+                      SmsAuditService auditService,
+                      SmsPhoneNumberNormalizer phoneNumberNormalizer) {
         this.providers = providers;
         this.config = config;
+        this.auditService = auditService;
+        this.phoneNumberNormalizer = phoneNumberNormalizer;
         this.activeProvider = new AtomicReference<>(selectProvider(config.getProvider()));
         log.info("SMS provider active: {}", activeProvider.get().getProviderName());
     }
 
     public OutboundSmsResult send(String to, String message) {
+        return send(to, message, null);
+    }
+
+    public OutboundSmsResult send(String to, String message, String relatedImei) {
         String normalised = normalisePhoneNumber(to);
         int maxAttempts = config.getRetry().getMaxAttempts();
         int attempts = 0;
+        OutboundSmsResult lastResult = null;
 
         while (attempts < maxAttempts) {
             try {
                 OutboundSmsResult result = activeProvider.get().send(normalised, message);
+                lastResult = result;
                 if (result.status() != SmsDeliveryStatus.FAILED) {
+                    auditService.recordOutbound(result, message, relatedImei);
                     return result;
                 }
                 attempts++;
@@ -53,16 +67,26 @@ public class SmsService {
         }
 
         log.error("SMS failed after {} attempts to {}", attempts, normalised);
-        return OutboundSmsResult.failed(normalised, activeProvider.get().getProviderName());
+        OutboundSmsResult failed = lastResult != null
+                ? lastResult
+                : OutboundSmsResult.failed(normalised, activeProvider.get().getProviderName());
+        auditService.recordOutbound(failed, message, relatedImei);
+        return failed;
     }
 
     public List<OutboundSmsResult> sendBulk(List<String> recipients, String message) {
         List<String> normalised = recipients.stream().map(this::normalisePhoneNumber).toList();
-        return activeProvider.get().sendBulk(normalised, message);
+        List<OutboundSmsResult> results = activeProvider.get().sendBulk(normalised, message);
+        results.forEach(result -> auditService.recordOutbound(result, message, null));
+        return results;
     }
 
     public OutboundSmsResult checkStatus(String messageId) {
         return activeProvider.get().checkStatus(messageId);
+    }
+
+    public OutboundSmsResult checkStatus(String providerName, String messageId) {
+        return selectProvider(providerName).checkStatus(messageId);
     }
 
     public String getActiveProviderName() {
@@ -84,14 +108,7 @@ public class SmsService {
                         + providers.stream().map(SmsProvider::getProviderName).toList()));
     }
 
-    String normalisePhoneNumber(String number) {
-        if (number == null) return "";
-        String cleaned = number.replaceAll("[^0-9+]", "");
-        if (cleaned.startsWith("0")) {
-            return "+234" + cleaned.substring(1);
-        } else if (cleaned.startsWith("234") && !cleaned.startsWith("+")) {
-            return "+" + cleaned;
-        }
-        return cleaned;
+    public String normalisePhoneNumber(String number) {
+        return phoneNumberNormalizer.normalise(number);
     }
 }

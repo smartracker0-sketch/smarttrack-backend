@@ -1,5 +1,5 @@
 CREATE TABLE sms_audit_log (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id            UUID PRIMARY KEY,
     message_id    VARCHAR(100),
     direction     VARCHAR(10) NOT NULL,
     provider      VARCHAR(30) NOT NULL,

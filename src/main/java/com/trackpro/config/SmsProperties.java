@@ -1,5 +1,8 @@
 package com.trackpro.config;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "trackpro.sms")
@@ -12,6 +15,9 @@ public class SmsProperties {
     private Server server = new Server();
     private Retry retry = new Retry();
     private RateLimit rateLimit = new RateLimit();
+    private Webhook webhook = new Webhook();
+    private DeliveryStatus deliveryStatus = new DeliveryStatus();
+    private Map<String, CommandProfile> commandProfiles = defaultCommandProfiles();
 
     public String getProvider() { return provider; }
     public void setProvider(String provider) { this.provider = provider; }
@@ -33,6 +39,27 @@ public class SmsProperties {
 
     public RateLimit getRateLimit() { return rateLimit; }
     public void setRateLimit(RateLimit rateLimit) { this.rateLimit = rateLimit; }
+
+    public Webhook getWebhook() { return webhook; }
+    public void setWebhook(Webhook webhook) { this.webhook = webhook; }
+
+    public DeliveryStatus getDeliveryStatus() { return deliveryStatus; }
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) { this.deliveryStatus = deliveryStatus; }
+
+    public Map<String, CommandProfile> getCommandProfiles() { return commandProfiles; }
+    public void setCommandProfiles(Map<String, CommandProfile> commandProfiles) {
+        this.commandProfiles = commandProfiles == null || commandProfiles.isEmpty()
+                ? defaultCommandProfiles()
+                : commandProfiles;
+    }
+
+    public CommandProfile commandProfileFor(String manufacturer) {
+        String key = manufacturer == null || manufacturer.isBlank()
+                ? "generic"
+                : manufacturer.toLowerCase(Locale.ROOT).trim();
+        CommandProfile profile = commandProfiles.get(key);
+        return profile != null ? profile : commandProfiles.getOrDefault("generic", new CommandProfile());
+    }
 
     public static class AfricasTalking {
         private String apiKey = "";
@@ -71,6 +98,39 @@ public class SmsProperties {
 
         public int getMaxPerMinute() { return maxPerMinute; }
         public void setMaxPerMinute(int maxPerMinute) { this.maxPerMinute = maxPerMinute; }
+    }
+
+    public static class Webhook {
+        private String sharedSecret = "";
+
+        public String getSharedSecret() { return sharedSecret; }
+        public void setSharedSecret(String sharedSecret) { this.sharedSecret = sharedSecret; }
+    }
+
+    public static class DeliveryStatus {
+        private boolean enabled = true;
+        private long pollRateMs = 300_000;
+        private int lookbackHours = 24;
+
+        public boolean isEnabled() { return enabled; }
+        public void setEnabled(boolean enabled) { this.enabled = enabled; }
+        public long getPollRateMs() { return pollRateMs; }
+        public void setPollRateMs(long pollRateMs) { this.pollRateMs = pollRateMs; }
+        public int getLookbackHours() { return lookbackHours; }
+        public void setLookbackHours(int lookbackHours) { this.lookbackHours = lookbackHours; }
+    }
+
+    public static class CommandProfile {
+        private String serverCommandTemplate = "SERVER,1,{host},{port},0";
+        private String apnCommandTemplate = "APN,{apn}";
+        private String statusCommand = "STATUS";
+
+        public String getServerCommandTemplate() { return serverCommandTemplate; }
+        public void setServerCommandTemplate(String serverCommandTemplate) { this.serverCommandTemplate = serverCommandTemplate; }
+        public String getApnCommandTemplate() { return apnCommandTemplate; }
+        public void setApnCommandTemplate(String apnCommandTemplate) { this.apnCommandTemplate = apnCommandTemplate; }
+        public String getStatusCommand() { return statusCommand; }
+        public void setStatusCommand(String statusCommand) { this.statusCommand = statusCommand; }
     }
 
     public static class Termii {
@@ -120,5 +180,11 @@ public class SmsProperties {
 
         public int getTcpPort() { return tcpPort; }
         public void setTcpPort(int tcpPort) { this.tcpPort = tcpPort; }
+    }
+
+    private static Map<String, CommandProfile> defaultCommandProfiles() {
+        Map<String, CommandProfile> profiles = new HashMap<>();
+        profiles.put("generic", new CommandProfile());
+        return profiles;
     }
 }

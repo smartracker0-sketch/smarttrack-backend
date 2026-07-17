@@ -32,9 +32,20 @@ trackpro:
       access-token-ttl: PT1H
       refresh-token-ttl: P30D
   sms:
+    provider: ${SMS_PROVIDER:termii}
     termii:
-      api-key: ${TERMII_API_KEY}
-      sender-id: ${TERMII_SENDER_ID}
+      api-key: ${TERMII_API_KEY:}
+      sender-id: ${TERMII_SENDER_ID:N-Alert}
+      base-url: ${TERMII_BASE_URL:https://api.ng.termii.com}
+    africastalking:
+      api-key: ${AT_API_KEY:}
+      username: ${AT_USERNAME:}
+      sender-id: ${AT_SENDER_ID:STTracker}
+      sandbox-mode: ${AT_SANDBOX:false}
+    webhook:
+      shared-secret: ${SMS_WEBHOOK_SECRET:}
+    delivery-status:
+      enabled: ${SMS_DELIVERY_STATUS_ENABLED:true}
     server:
       host: ${TRACKPRO_SERVER_HOST}
 
