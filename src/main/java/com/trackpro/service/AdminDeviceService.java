@@ -2,6 +2,7 @@ package com.trackpro.service;
 
 import com.trackpro.dto.admin.AdminBulkDeviceRequest;
 import com.trackpro.dto.admin.AdminDeviceDto;
+import com.trackpro.dto.admin.AdminDeviceUpdateRequest;
 import com.trackpro.exception.BadRequestException;
 import com.trackpro.exception.NotFoundException;
 import com.trackpro.model.DeviceEntity;
@@ -91,6 +92,25 @@ public class AdminDeviceService {
     }
 
     @Transactional
+    public AdminDeviceDto update(UUID deviceId, AdminDeviceUpdateRequest req) {
+        DeviceEntity d = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new NotFoundException("Device not found"));
+
+        if (req.name() != null) d.setName(req.name().trim());
+        if (req.deviceType() != null) d.setDeviceType(req.deviceType().trim());
+        if (req.firmware() != null) d.setFirmware(req.firmware().trim());
+        if (req.simCard() != null) d.setSimCard(req.simCard().trim());
+        if (req.serialNo() != null) d.setSerialNo(req.serialNo().trim());
+        if (req.vehiclePlate() != null) d.setVehiclePlate(req.vehiclePlate().trim());
+        if (req.notes() != null) d.setNotes(req.notes().trim());
+        if (req.simNumber() != null) d.setSimNumber(req.simNumber().trim());
+        if (req.simApn() != null) d.setSimApn(req.simApn().trim());
+        if (req.manufacturer() != null) d.setManufacturer(req.manufacturer().trim());
+
+        return toDto(deviceRepository.save(d));
+    }
+
+    @Transactional
     public AdminDeviceDto assignOrganisation(UUID deviceId, UUID orgId) {
         DeviceEntity d = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found"));
@@ -148,6 +168,7 @@ public class AdminDeviceService {
                 owner != null ? owner.getId() : null,
                 owner != null ? owner.getDisplayName() : null,
                 d.getSimNumber(),
+                d.getSimApn(),
                 d.getManufacturer(),
                 d.getActivationStatus(),
                 d.getActivationAttempts(),

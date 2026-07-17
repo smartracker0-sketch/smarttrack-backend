@@ -2,6 +2,7 @@ package com.trackpro.controller;
 
 import com.trackpro.dto.admin.AdminBulkDeviceRequest;
 import com.trackpro.dto.admin.AdminDeviceDto;
+import com.trackpro.dto.admin.AdminDeviceUpdateRequest;
 import com.trackpro.service.AdminDeviceService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,6 +47,11 @@ public class AdminDeviceController {
     @ResponseStatus(HttpStatus.CREATED)
     public List<AdminDeviceDto> bulkAdd(@Valid @RequestBody AdminBulkDeviceRequest req) {
         return service.bulkAdd(req);
+    }
+
+    @PutMapping("/{id}")
+    public AdminDeviceDto update(@PathVariable UUID id, @RequestBody AdminDeviceUpdateRequest req) {
+        return service.update(id, req);
     }
 
     @PatchMapping("/{id}/assign")

@@ -138,6 +138,7 @@
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/repository/DeviceRepository.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/sms/SmsPhoneNumberNormalizer.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/model/Document.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/admin/AdminDeviceUpdateRequest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/service/DeviceService.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/repository/OrganisationRepository.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/controller/DriverController.java

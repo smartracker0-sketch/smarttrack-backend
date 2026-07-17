@@ -19,6 +19,7 @@ public record AdminDeviceDto(
         UUID ownerId,
         String ownerName,
         String simNumber,
+        String simApn,
         String manufacturer,
         String activationStatus,
         int activationAttempts,
