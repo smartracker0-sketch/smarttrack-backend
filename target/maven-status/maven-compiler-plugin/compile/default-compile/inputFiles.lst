@@ -116,6 +116,7 @@
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/alert/rules/IgnitionAnomalyRule.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/exception/NotFoundException.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/device/DeviceCreateRequest.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/security/DeviceCommandPasswordCipher.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/dto/auth/LoginRequest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/sms/SmsAuditService.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/main/java/com/trackpro/sms/InboundSmsParser.java

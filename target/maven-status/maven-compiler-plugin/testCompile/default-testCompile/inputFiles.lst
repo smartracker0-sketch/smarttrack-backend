@@ -10,4 +10,5 @@
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/alert/rules/OverspeedRuleTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/sms/DeviceCommandBuilderTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/alert/rules/GeofenceRuleTest.java
+/Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/telemetry/netty/Gt06DecoderTest.java
 /Users/mac/Documents/GitHub/tracpro/backend/src/test/java/com/trackpro/DeviceApiIntegrationTest.java
