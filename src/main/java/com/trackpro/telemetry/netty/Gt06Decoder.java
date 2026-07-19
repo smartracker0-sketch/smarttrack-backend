@@ -131,8 +131,8 @@ public class Gt06Decoder extends ByteToMessageDecoder {
         if (data.length > 17) {
             flags   = ((data[16] & 0xFF) << 8) | (data[17] & 0xFF);
             heading = flags & 0x03FF;
-            if ((flags & 0x0400) == 0) lat  = -lat;   // south
-            if ((flags & 0x0800) == 0) lon  = -lon;   // west
+            if ((flags & 0x0400) == 0) lat  = -lat;   // south (bit 10 clear)
+            if ((flags & 0x0800) != 0) lon  = -lon;   // west (bit 11 set)
         }
 
         boolean ignition = (flags & 0x8000) != 0;
